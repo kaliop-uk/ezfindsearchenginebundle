@@ -26,7 +26,7 @@ class LogicalNot extends CriterionHandler
             throw new InvalidCriterionException("LogicalNot can receive one criteria only");
         }
 
-        $result = trim($converter->convertCriteria($criterion->criteria[0]),'()');
+        $result = trim($converter->handle($criterion->criteria[0]),'()');
         $result = '-' . preg_replace('%(AND |OR )%', '$1-', $result);
         return $result;
     }

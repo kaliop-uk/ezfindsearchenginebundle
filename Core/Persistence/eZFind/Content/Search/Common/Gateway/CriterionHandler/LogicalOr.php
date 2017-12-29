@@ -22,7 +22,7 @@ class LogicalOr extends CriterionHandler
                 ' OR ',
                 array_map(
                     function ($value) use ($converter) {
-                        return $converter->convertCriteria($value);
+                        return $converter->handle($value);
                     },
                     $criterion->criteria
                 )

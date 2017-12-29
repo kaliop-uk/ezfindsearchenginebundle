@@ -22,7 +22,7 @@ class LogicalAnd extends CriterionHandler
                 ' AND ',
                 array_map(
                     function ($value) use ($converter) {
-                        return $converter->convertCriteria($value);
+                        return $converter->handle($value);
                     },
                     $criterion->criteria
                 )

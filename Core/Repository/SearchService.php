@@ -133,14 +133,14 @@ class SearchService implements SearchServiceInterface
             $extras = $result['SearchExtras'];
             $responseHeader = $extras->attribute('responseHeader');
             $time = $responseHeader['QTime'];
-        }
 
-        // Find max score as we're not able to access it from SearchExtras.
-        $maxScore = null;
-        foreach ($result['SearchHits'] as $searchHit) {
-            /** @var SearchHit $searchHit */
-            if ($maxScore < $searchHit->score) {
-                $maxScore = $searchHit->score;
+            // trick to access data from a protected member of ezfSearchResultInfo
+            // @see http://blag.kazeno.net/development/access-private-protected-properties
+            $propGetter = Closure::bind(  function($prop){return $this->$prop;}, $extras, $extras );
+            $resultArray = $propGetter('ResultArray');
+
+            if (isset($resultArray['response']['maxScore'])) {
+                $maxScore = $resultArray['response']['maxScore'];
             }
         }
 
@@ -580,7 +580,7 @@ class SearchService implements SearchServiceInterface
 //    protected function extractFacetFilter(&$criterion)
 //    {
 //        // Still need to check the logical operators
-//        if ($this->criteriaConverter->canConvertCriteria($criterion, 'logicalHandlers')) {
+//        if ($this->criteriaConverter->canHandle($criterion, 'logicalHandlers')) {
 //            return $this->extractSubtreeArray($criterion->criteria);
 //        }
 //

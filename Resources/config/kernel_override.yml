@@ -1,0 +1,14 @@
+# In order to make sure that the CLI legacy kernel is always booted, we take over the legacy kernel loader,
+# and change the signature of the buildLegacyKernel method
+
+parameters:
+    ezpublish_legacy.kernel.lazy_loader.class: Kaliop\EzFindSearchEngineBundle\Core\MVC\Legacy\Kernel\Loader
+
+services:
+    ezpublish_legacy.kernel.lazy:
+        class: Closure
+        factory_service: ezpublish_legacy.kernel.lazy_loader
+        factory_method: buildLegacyKernel
+        arguments:
+            - '@ezpublish_legacy.kernel_handler'
+            - '@ezpublish_legacy.kernel_handler.cli'

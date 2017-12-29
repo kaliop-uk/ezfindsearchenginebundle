@@ -1,0 +1,31 @@
+{
+    "name": "kaliop/ezfindsearchenginebundle",
+    "type": "symfony-bundle",
+    "description": "Kaliop eZFind-Search-Engine Bundle",
+    "keywords": ["ezfind", "solr", "search", "ezpublish"],
+    "license": "GPL-2.0",
+    "require": {
+        "php": ">=5.6",
+        "ezsystems/ezpublish-kernel": ">=5.4|>=2014.11",
+        "ezsystems/ezfind-ls":  "*"
+    },
+    "require-dev": {
+        "kaliop/ezmigrationbundle": "~4.0",
+        "phpunit/phpunit": "~4.0 || ~5.0",
+        "codeclimate/php-test-reporter": "~0.4"
+    },
+    "autoload": {
+        "psr-4": { "Kaliop\\EzFindSearchEngineBundle\\": "" }
+    },
+    "_comment::travis": "the following section is needed to insure that eZPublish 5 can be built on travis, using the custom directory structure where it is not in the root folder",
+    "extra": {
+        "ezpublish-legacy-dir": "vendor/ezsystems/ezpublish-legacy"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/gggeek/BehatBundle",
+            "no-api": true
+        }
+    ]
+}

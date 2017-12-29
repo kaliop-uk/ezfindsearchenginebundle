@@ -1,0 +1,35 @@
+services:
+    ezfind_search_engine.content.sort_clause_handler.content.name:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\SortClauseHandler\ContentName
+        tags:
+            - {name: ezfind_search_engine.content.sort_clause_handler}
+
+    ezfind_search_engine.content.sort_clause_handler.content.date.modified:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\SortClauseHandler\DateModified
+        tags:
+            - {name: ezfind_search_engine.content.sort_clause_handler}
+
+    ezfind_search_engine.content.sort_clause_handler.content.date.published:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\SortClauseHandler\DatePublished
+        tags:
+            - {name: ezfind_search_engine.content.sort_clause_handler}
+
+    ezfind_search_engine.content.sort_clause_handler.content.field:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\SortClauseHandler\Field
+        tags:
+            - {name: ezfind_search_engine.content.sort_clause_handler}
+
+    ezfind_search_engine.content.sort_clause_handler.content.location.priority:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\SortClauseHandler\LocationPriority
+        tags:
+            - {name: ezfind_search_engine.content.sort_clause_handler}
+
+    ezfind_search_engine.content.sort_clause_handler.content.score:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\SortClauseHandler\Score
+        tags:
+            - {name: ezfind_search_engine.content.sort_clause_handler}
+
+    ezfind_search_engine.content.sort_clause_handler.content.solr_raw:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\SortClauseHandler\SolrRaw
+        tags:
+            - {name: ezfind_search_engine.content.sort_clause_handler}

@@ -1,0 +1,64 @@
+services:
+    # Logical
+    ezfind_search_engine.content.criterion_handler.logical_and:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\LogicalAnd
+        tags:
+            - {name: ezfind_search_engine.content.criterion_handler.logical}
+
+    ezfind_search_engine.content.criterion_handler.logical_not:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\LogicalNot
+        tags:
+            - {name: ezfind_search_engine.content.criterion_handler.logical}
+
+    ezfind_search_engine.content.criterion_handler.logical_or:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\LogicalOr
+        tags:
+            - {name: ezfind_search_engine.content.criterion_handler.logical}
+
+    # Query String
+    ezfind_search_engine.content.criterion_handler.full_text:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\FullText
+        tags:
+            - {name: ezfind_search_engine.content.criterion_handler.query_string}
+
+    # Content Type
+    ezfind_search_engine.content.criterion_handler.content_type.id:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\ContentTypeId
+        tags:
+            - {name: ezfind_search_engine.content.criterion_handler.content_type}
+
+    ezfind_search_engine.content.criterion_handler.content_type.identifier:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\ContentTypeIdentifier
+        tags:
+            - {name: ezfind_search_engine.content.criterion_handler.content_type}
+
+    # Subtree
+    ezfind_search_engine.content.criterion_handler.content.parent_location_id:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\ParentLocationId
+        tags:
+            - {name: ezfind_search_engine.content.criterion_handler.subtree}
+
+    ezfind_search_engine.content.criterion_handler.content.subtree:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\Subtree
+        tags:
+            - {name: ezfind_search_engine.content.criterion_handler.subtree}
+
+    # Filter
+    ezfind_search_engine.content.criterion_handler.content.remote_id:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\RemoteId
+        tags:
+            - {name: ezfind_search_engine.content.criterion_handler.filter}
+
+    ezfind_search_engine.content.criterion_handler.field.in:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\FieldIn
+        arguments:
+          - '@ezpublish_legacy.kernel.lazy'
+        tags:
+            - {name: ezfind_search_engine.content.criterion_handler.filter}
+
+    ezfind_search_engine.content.criterion_handler.field.like:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\FieldLike
+        arguments:
+          - '@ezpublish_legacy.kernel.lazy'
+        tags:
+            - {name: ezfind_search_engine.content.criterion_handler.filter}

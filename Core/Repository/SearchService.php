@@ -43,13 +43,13 @@ class SearchService implements SearchServiceInterface
     protected $contentTypeService;
 
     /** @var CriteriaConverter */
-    protected $logicalCriteriaConverter;
+    ///protected $logicalCriteriaConverter;
 
     /** @var CriteriaConverter */
-    protected $subtreeCriteriaConverter;
+    ///protected $subtreeCriteriaConverter;
 
     /** @var CriteriaConverter */
-    protected $contentTypeCriteriaConverter;
+    ///protected $contentTypeCriteriaConverter;
 
     /** @var CriteriaConverter */
     protected $filterCriteriaConverter;
@@ -73,9 +73,9 @@ class SearchService implements SearchServiceInterface
         Closure $legacyKernelClosure,
         ContentService $contentService,
         ContentTypeService $contentTypeService,
-        CriteriaConverter $logicalCriteriaConverter,
-        CriteriaConverter $subtreeCriteriaConverter,
-        CriteriaConverter $contentTypeCriteriaConverter,
+        ///CriteriaConverter $logicalCriteriaConverter,
+        ///CriteriaConverter $subtreeCriteriaConverter,
+        ///CriteriaConverter $contentTypeCriteriaConverter,
         CriteriaConverter $filterCriteriaConverter,
         CriteriaConverter $queryStringConverter,
         SortClauseConverter $sortClauseConverter,
@@ -95,9 +95,9 @@ class SearchService implements SearchServiceInterface
         $this->logger = $logger;
 
         // Converters
-        $this->logicalCriteriaConverter = $logicalCriteriaConverter;
-        $this->subtreeCriteriaConverter = $subtreeCriteriaConverter;
-        $this->contentTypeCriteriaConverter = $contentTypeCriteriaConverter;
+        ///$this->logicalCriteriaConverter = $logicalCriteriaConverter;
+        ///$this->subtreeCriteriaConverter = $subtreeCriteriaConverter;
+        ///$this->contentTypeCriteriaConverter = $contentTypeCriteriaConverter;
         $this->filterCriteriaConverter = $filterCriteriaConverter;
         $this->queryStringConverter = $queryStringConverter;
         $this->sortClauseConverter = $sortClauseConverter;
@@ -136,7 +136,7 @@ class SearchService implements SearchServiceInterface
 
             // trick to access data from a protected member of ezfSearchResultInfo
             // @see http://blag.kazeno.net/development/access-private-protected-properties
-            $propGetter = Closure::bind(  function($prop){return $this->$prop;}, $extras, $extras );
+            $propGetter = Closure::bind(function($prop){return $this->$prop;}, $extras, $extras);
             $resultArray = $propGetter('ResultArray');
 
             if (isset($resultArray['response']['maxScore'])) {
@@ -287,12 +287,12 @@ class SearchService implements SearchServiceInterface
         if ($query->criterion) {
             $criterion = clone $query->criterion;
 
-            $subTreeArray = $this->extractSubtreeArray($criterion);
-            if (null != $subTreeArray) {
-                $searchParameters['subtree_array'] = $subTreeArray;
-            }
+            ///$subTreeArray = $this->extractSubtreeArray($criterion);
+            ///if (null != $subTreeArray) {
+            ///    $searchParameters['subtree_array'] = $subTreeArray;
+            ///}
 
-            $searchParameters['class_id'] = $this->extractContentTypeIdentifierFilter($criterion);
+            ///$searchParameters['class_id'] = $this->extractContentTypeIdentifierFilter($criterion);
             $searchParameters['query'] = $this->extractQueryString($criterion);
             $searchParameters['filter'] = $this->extractFilter($criterion);
             //$searchParameters['facet'] = array_merge($this->generateBaseFacets(), $this->extractFacetFilter($criterion));
@@ -351,33 +351,34 @@ class SearchService implements SearchServiceInterface
         return ($query instanceof KaliopQuery) ? !$query->returnRawData : $this->defaultReturnObjects;
     }
 
+    /**
+     * @todo handle recursivity
+     */
     protected function extractQueryString(&$criterion)
     {
-        if ($criterion instanceof LogicalOperator) {
+        /*if ($criterion instanceof LogicalOperator) {
             if ($this->logicalCriteriaConverter->canHandle($criterion)) {
                 return $this->extractQueryString($criterion->criteria);
             }
+        }*/
+
+        if (!is_array($criterion)) {
+            $criterion = [$criterion];
         }
-        if (!is_null($this->queryStringConverter)) {
 
-            if (!is_array($criterion)) {
-                $criterion = [$criterion];
-            }
+        foreach ($criterion as $index => $filter) {
+            if ($this->queryStringConverter->canHandle($filter)) {
+                $result = $this->queryStringConverter->handle($filter);
+                unset($criterion[$index]);
 
-            foreach ($criterion as $index => $filter) {
-                if ($this->queryStringConverter->canHandle($filter)) {
-                    $result = $this->queryStringConverter->handle($filter);
-                    unset($criterion[$index]);
-
-                    return $result;
-                }
+                return $result;
             }
         }
 
         return '';
     }
 
-    protected function extractSubtreeArray(&$criterion)
+    /*protected function extractSubtreeArray(&$criterion)
     {
         if ($criterion instanceof LogicalOperator) {
             if ($this->logicalCriteriaConverter->canHandle($criterion)) {
@@ -397,14 +398,14 @@ class SearchService implements SearchServiceInterface
         }
 
         return null;
-    }
+    }*/
 
     /**
      * Extracts both ContentTypeIdentifier and ContentTypeId criteria
      * @param $criterion
      * @return mixed|string
      */
-    protected function extractContentTypeIdentifierFilter(&$criterion)
+    /*protected function extractContentTypeIdentifierFilter(&$criterion)
     {
         // Still need to check the logical operators
         if ($criterion instanceof LogicalOperator) {
@@ -427,16 +428,16 @@ class SearchService implements SearchServiceInterface
         }
 
         return '';
-    }
+    }*/
 
     protected function extractFilter(&$criterion)
     {
         // Still need to check the logical operators
-        if ($criterion instanceof LogicalOperator) {
+        /*if ($criterion instanceof LogicalOperator) {
             if ($this->logicalCriteriaConverter->canHandle($criterion)) {
                 return $this->extractFilter($criterion->criteria);
             }
-        }
+        }*/
 
         if (!is_array($criterion)) {
             $criterion = [$criterion];
@@ -444,8 +445,8 @@ class SearchService implements SearchServiceInterface
 
         $result = [];
         foreach ($criterion as $index => $filter) {
-            if ($this->contentTypeCriteriaConverter->canHandle($filter)) {
-                $result[] = $this->contentTypeCriteriaConverter->handle($filter);
+            if ($this->filterCriteriaConverter->canHandle($filter)) {
+                $result[] = $this->filterCriteriaConverter->handle($filter);
             }
         }
 

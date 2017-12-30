@@ -11,16 +11,12 @@ class Subtree extends CriterionHandler
 {
     public function accept(Criterion $criterion)
     {
-        return
-            (
-                $criterion instanceof Criterion\Subtree &&
-                in_array($criterion->operator, [Operator::EQ, Operator::IN])
-            );
+        return $criterion instanceof Criterion\Subtree;
     }
 
     public function handle(CriteriaConverter $converter, Criterion $criterion)
     {
-        return '(' .
+        /*return '(' .
             implode(
                 ' AND ',
                 array_map(
@@ -30,6 +26,16 @@ class Subtree extends CriterionHandler
                     $criterion->value
                 )
             ) .
-            ')';
+            ')';*/
+        $result = [];
+
+        $valueList = (array)$criterion->value;
+
+        foreach ($valueList as $value) {
+            /// @todo is this correct? should we use 'path' instead ?
+            $result[] = 'meta_path_string_ms:' . str_replace('/', '\\/', $value) . '*';
+        }
+
+        return count($result) == 1 ? $result[0] : array_unshift($result, 'OR');
     }
 }

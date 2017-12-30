@@ -11,13 +11,19 @@ class ContentTypeId extends CriterionHandler
     public function accept(Criterion $criterion)
     {
         return
-            $criterion instanceof Criterion\ContentTypeId &&
-            (($criterion->operator ?: Criterion\Operator::IN) === Criterion\Operator::IN ||
-                $criterion->operator === Criterion\Operator::EQ);
+            $criterion instanceof Criterion\ContentTypeId;
     }
 
     public function handle(CriteriaConverter $converter, Criterion $criterion)
     {
-        return $criterion->value;
+        $result = [];
+
+        $valueList = (array)$criterion->value;
+
+        foreach ($valueList as $value) {
+            $result[] = 'contentclass_id:' . $value;
+        }
+
+        return count($result) == 1 ? $result[0] : array_unshift($result, 'OR');
     }
 }

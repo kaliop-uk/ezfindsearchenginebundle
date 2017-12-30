@@ -17,7 +17,7 @@ class LogicalAnd extends CriterionHandler
 
     public function handle(CriteriaConverter $converter, Criterion $criterion)
     {
-        return '(' .
+        /*return '(' .
             implode(
                 ' AND ',
                 array_map(
@@ -27,6 +27,15 @@ class LogicalAnd extends CriterionHandler
                     $criterion->criteria
                 )
             ) .
-            ')';
+            ')';*/
+        return array_merge(
+            array('AND'),
+            array_map(
+                function ($value) use ($converter) {
+                    return $converter->handle($value);
+                },
+                $criterion->criteria
+            )
+        );
     }
 }

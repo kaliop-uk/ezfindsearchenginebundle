@@ -10,25 +10,20 @@ class RemoteId extends CriterionHandler
 {
     public function accept(Criterion $criterion)
     {
-        $criterion instanceof Criterion\RemoteId &&
-        (($criterion->operator ?: Criterion\Operator::IN) === Criterion\Operator::IN ||
-            $criterion->operator === Criterion\Operator::EQ);
+        return $criterion instanceof Criterion\RemoteId;
     }
 
     public function handle(CriteriaConverter $converter, Criterion $criterion)
     {
         $result = [];
 
-        if (!is_array($criterion->value)) {
-            $valueList = [$criterion->value];
-        } else {
-            $valueList = $criterion->value;
-        }
+        $valueList = (array)$criterion->value;
 
         foreach ($valueList as $value) {
+            /// @todo is this correct, or should it be meta_remote_id_ms ?
             $result[] = 'remote_id:' . $value;
         }
 
-        return $result;
+        return count($result) == 1 ? $result[0] : array_unshift($result, 'OR');
     }
 }

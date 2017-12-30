@@ -18,12 +18,13 @@ class LogicalNot extends CriterionHandler
         return $criterion instanceof Criterion\LogicalNot;
     }
 
+    /// @todo fix this
     public function handle(CriteriaConverter $converter, Criterion $criterion)
     {
         if (!isset($criterion->criteria[0]) ||
             count($criterion->criteria) > 1
         ) {
-            throw new InvalidCriterionException("LogicalNot can receive one criteria only");
+            throw new InvalidCriterionException("LogicalNot can receive one criterion only");
         }
 
         $result = trim($converter->handle($criterion->criteria[0]),'()');

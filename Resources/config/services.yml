@@ -39,27 +39,11 @@ services:
             - '@ezpublish_legacy.kernel_handler'
             - '@ezpublish_legacy.kernel_handler.cli'
 
-    # Note: tag handler services with 'ezfind_search_engine.content.criterion_handler.logical' to include them in this converter
-    ###ezfind_search_engine.content.criteria_converter.logical:
-    ###    class: '%ezfind_search_engine.content.criteria_converter.class%'
-
-    # Note: tag handler services with 'ezfind_search_engine.content.criterion_handler.subtree' to include them in this converter
-    ###ezfind_search_engine.content.criteria_converter.subtree:
-    ###    class: '%ezfind_search_engine.content.criteria_converter.class%'
-
-    # Note: tag handler services with 'ezfind_search_engine.content.criterion_handler.content_type' to include them in this converter
-    ###ezfind_search_engine.content.criteria_converter.content_type:
-    ###    class: '%ezfind_search_engine.content.criteria_converter.class%'
-
     # Note: tag handler services with 'ezfind_search_engine.content.criterion_handler.filter' to include them in this converter
     ezfind_search_engine.content.criteria_converter.filter:
         class: '%ezfind_search_engine.content.criteria_converter.class%'
 
-    # Note: tag handler services with 'ezfind_search_engine.content.criterion_handler.query_string' to include them in this converter
-    ezfind_search_engine.content.criteria_converter.query_string:
-        class: '%ezfind_search_engine.content.criteria_converter.class%'
-
-    # Note: tag handler services with 'ezfind_search_engine.content.criterion_handler.filter' to include them in this converter
+    # Note: tag handler services with 'ezfind_search_engine.content.sort_clause_handler' to include them in this converter
     ezfind_search_engine.content.sort_clause_converter:
         class: '%ezfind_search_engine.content.sort_clause_converter.class%'
 
@@ -69,11 +53,7 @@ services:
             - '@ezpublish_legacy.kernel'
             - '@ezpublish.api.service.content'
             - '@ezpublish.api.service.content_type'
-            ###- '@ezfind_search_engine.content.criteria_converter.logical'
-            ###- '@ezfind_search_engine.content.criteria_converter.subtree'
-            ###- '@ezfind_search_engine.content.criteria_converter.content_type'
             - '@ezfind_search_engine.content.criteria_converter.filter'
-            - '@ezfind_search_engine.content.criteria_converter.query_string'
             - '@ezfind_search_engine.content.sort_clause_converter'
             - '%ezfind_search_engine.search_settings.boost_functions%'
             - '%ezfind_search_engine.search_settings.fields_to_return%'

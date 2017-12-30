@@ -21,7 +21,7 @@ The bundle comes fully configured by default. Here is an example of the complete
     ezfind_search_engine.search_settings.legacy_function_handler.function_name: 'search'
     ezfind_search_engine.search_settings.boost_functions:
         - 'recip(ms(NOW/HOUR,attr_publication_date_dt),4e-12,1000,2)'
-    # default list of fields returned
+    # default list of fields returned when *not* returning Contents
     ezfind_search_engine.search_settings.fields_to_return:
         - meta_name_t
         - meta_owner_name_t
@@ -57,17 +57,9 @@ configuration to be sent to Solr.
 
 You can add more custom handlers using tagged services, with the following tags:
 
-#### ezfind_search_engine.content.criterion_handler.logical
+#### ezfind_search_engine.content.criterion_handler.query_string
 
-Any logical handler that you need (AND / OR are already implemented)
-
-#### ezfind_search_engine.content.criterion_handler.subtree
-
-Subtree related handlers (e.g. ParentLocationId)
-
-#### ezfind_search_engine.content.criterion_handler.content_type
-
-Content type related handlers (e.g. ContentTypeIdentifier, ContentTypeId)
+Criteria that will generate a Solr query string
 
 #### ezfind_search_engine.content.criterion_handler.filter
 

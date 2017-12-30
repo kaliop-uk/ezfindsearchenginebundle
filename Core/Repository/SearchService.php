@@ -43,19 +43,7 @@ class SearchService implements SearchServiceInterface
     protected $contentTypeService;
 
     /** @var CriteriaConverter */
-    ///protected $logicalCriteriaConverter;
-
-    /** @var CriteriaConverter */
-    ///protected $subtreeCriteriaConverter;
-
-    /** @var CriteriaConverter */
-    ///protected $contentTypeCriteriaConverter;
-
-    /** @var CriteriaConverter */
     protected $filterCriteriaConverter;
-
-    /** @var CriteriaConverter */
-    protected $queryStringConverter;
 
     /** @var SortClauseConverter */
     protected $sortClauseConverter;
@@ -73,11 +61,7 @@ class SearchService implements SearchServiceInterface
         Closure $legacyKernelClosure,
         ContentService $contentService,
         ContentTypeService $contentTypeService,
-        ///CriteriaConverter $logicalCriteriaConverter,
-        ///CriteriaConverter $subtreeCriteriaConverter,
-        ///CriteriaConverter $contentTypeCriteriaConverter,
         CriteriaConverter $filterCriteriaConverter,
-        CriteriaConverter $queryStringConverter,
         SortClauseConverter $sortClauseConverter,
         $defaultBoostFunctions,
         $defaultFieldsToReturn,
@@ -95,11 +79,7 @@ class SearchService implements SearchServiceInterface
         $this->logger = $logger;
 
         // Converters
-        ///$this->logicalCriteriaConverter = $logicalCriteriaConverter;
-        ///$this->subtreeCriteriaConverter = $subtreeCriteriaConverter;
-        ///$this->contentTypeCriteriaConverter = $contentTypeCriteriaConverter;
         $this->filterCriteriaConverter = $filterCriteriaConverter;
-        $this->queryStringConverter = $queryStringConverter;
         $this->sortClauseConverter = $sortClauseConverter;
 
         // Making sure these are arrays
@@ -124,9 +104,6 @@ class SearchService implements SearchServiceInterface
         $maxScore = null;
         $time = null;
 
-        /// @todo optimize: we should try to replace SearchExtras with a subclass that gives us access to f.e. $maxScore
-        ///       and remove from it 'response' to save memory
-
         // q: is there any case where SearchExtras is not set or of a different type?
         if (isset($result['SearchExtras']) && $result['SearchExtras'] instanceof \ezfSearchResultInfo) {
             /** @var \ezfSearchResultInfo $extras */
@@ -142,6 +119,8 @@ class SearchService implements SearchServiceInterface
             if (isset($resultArray['response']['maxScore'])) {
                 $maxScore = $resultArray['response']['maxScore'];
             }
+
+            /// @todo optimize: remove from SearchExtras 'response' to save memory using the 'Closure::bind' hack
         }
 
         return new KaliopSearchResult(
@@ -225,7 +204,7 @@ class SearchService implements SearchServiceInterface
         $this->initializeQueryLimit($query);
 
         $searchParameters = $this->getLegacySearchParameters($query, $fieldFilters, $filterOnUserPermissions, $returnObjects);
-//var_dump($searchParameters);
+
         /** @var array $searchResult */
         $searchResult = $this->getLegacyKernel()->runCallback(
             function () use ($searchParameters) {
@@ -285,16 +264,9 @@ class SearchService implements SearchServiceInterface
         ];
 
         if ($query->criterion) {
-            $criterion = clone $query->criterion;
-
-            ///$subTreeArray = $this->extractSubtreeArray($criterion);
-            ///if (null != $subTreeArray) {
-            ///    $searchParameters['subtree_array'] = $subTreeArray;
-            ///}
-
-            ///$searchParameters['class_id'] = $this->extractContentTypeIdentifierFilter($criterion);
-            $searchParameters['query'] = $this->extractQueryString($criterion);
-            $searchParameters['filter'] = $this->extractFilter($criterion);
+            //
+            $searchParameters['query'] = ''; // seems to work well enough - we put everything in the filter...
+            $searchParameters['filter'] = $this->extractFilter($query->criterion);
             //$searchParameters['facet'] = array_merge($this->generateBaseFacets(), $this->extractFacetFilter($criterion));
         }
 
@@ -302,7 +274,7 @@ class SearchService implements SearchServiceInterface
             $searchParameters['sort_by'] = $this->extractSort($query->sortClauses);
         }
 
-        // If we need to filter on permissions, set this to null so eZFind will fill it in
+        // If we need to filter on permissions, set this to null so eZFind will fill it in.
         // Otherwise an empty array prevents eZFind from applying limitations
         if ($filterOnUserPermissions) {
             $searchParameters['limitation'] = null;
@@ -351,94 +323,8 @@ class SearchService implements SearchServiceInterface
         return ($query instanceof KaliopQuery) ? !$query->returnRawData : $this->defaultReturnObjects;
     }
 
-    /**
-     * @todo handle recursivity
-     */
-    protected function extractQueryString(&$criterion)
+    protected function extractFilter($criterion)
     {
-        /*if ($criterion instanceof LogicalOperator) {
-            if ($this->logicalCriteriaConverter->canHandle($criterion)) {
-                return $this->extractQueryString($criterion->criteria);
-            }
-        }*/
-
-        if (!is_array($criterion)) {
-            $criterion = [$criterion];
-        }
-
-        foreach ($criterion as $index => $filter) {
-            if ($this->queryStringConverter->canHandle($filter)) {
-                $result = $this->queryStringConverter->handle($filter);
-                unset($criterion[$index]);
-
-                return $result;
-            }
-        }
-
-        return '';
-    }
-
-    /*protected function extractSubtreeArray(&$criterion)
-    {
-        if ($criterion instanceof LogicalOperator) {
-            if ($this->logicalCriteriaConverter->canHandle($criterion)) {
-                return $this->extractSubtreeArray($criterion->criteria);
-            }
-        }
-
-        if (!is_array($criterion)) {
-            $criterion = [$criterion];
-        }
-
-        foreach ($criterion as $index => $filter) {
-            if ($this->subtreeCriteriaConverter->canHandle($filter)) {
-                unset($criterion[$index]);
-                return $filter->value;
-            }
-        }
-
-        return null;
-    }*/
-
-    /**
-     * Extracts both ContentTypeIdentifier and ContentTypeId criteria
-     * @param $criterion
-     * @return mixed|string
-     */
-    /*protected function extractContentTypeIdentifierFilter(&$criterion)
-    {
-        // Still need to check the logical operators
-        if ($criterion instanceof LogicalOperator) {
-            if ($this->logicalCriteriaConverter->canHandle($criterion)) {
-                return $this->extractContentTypeIdentifierFilter($criterion->criteria);
-            }
-        }
-
-        if (!is_array($criterion)) {
-            $criterion = [$criterion];
-        }
-
-        foreach ($criterion as $index => $filter) {
-            if ($this->contentTypeCriteriaConverter->canHandle($filter)) {
-                $result = $this->contentTypeCriteriaConverter->handle($filter);
-                unset($criterion[$index]);
-
-                return $result;
-            }
-        }
-
-        return '';
-    }*/
-
-    protected function extractFilter(&$criterion)
-    {
-        // Still need to check the logical operators
-        /*if ($criterion instanceof LogicalOperator) {
-            if ($this->logicalCriteriaConverter->canHandle($criterion)) {
-                return $this->extractFilter($criterion->criteria);
-            }
-        }*/
-
         if (!is_array($criterion)) {
             $criterion = [$criterion];
         }
@@ -510,7 +396,6 @@ class SearchService implements SearchServiceInterface
         if ($returnObjects) {
             foreach ($searchResults as $index => $result) {
                 try {
-//var_dump($result);
                     $searchResults[$index] = new SearchHit(
                         [
                             'valueObject' => $this->contentService->loadContent($result['id']),

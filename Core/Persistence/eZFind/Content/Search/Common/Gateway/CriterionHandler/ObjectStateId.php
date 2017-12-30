@@ -28,7 +28,7 @@ class ObjectStateId extends CriterionHandler
         $valueList = (array)$criterion->value;
 
         foreach ($valueList as $value) {
-            $result[] = 'object_states:' . $value;
+            $result[] = 'object_states:' . $this->escapeValue($value);
         }
 
         return count($result) == 1 ? $result[0] : array_unshift($result, 'OR');

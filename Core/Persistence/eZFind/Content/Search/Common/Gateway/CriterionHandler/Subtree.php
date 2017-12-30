@@ -16,24 +16,14 @@ class Subtree extends CriterionHandler
 
     public function handle(CriteriaConverter $converter, Criterion $criterion)
     {
-        /*return '(' .
-            implode(
-                ' AND ',
-                array_map(
-                    function ($value) {
-                        return 'meta_path_string_ms:' . str_replace('/', '\\/', $value) . '*';
-                    },
-                    $criterion->value
-                )
-            ) .
-            ')';*/
         $result = [];
 
         $valueList = (array)$criterion->value;
 
         foreach ($valueList as $value) {
-            /// @todo is this correct? should we use 'path' instead ?
-            $result[] = 'meta_path_string_ms:' . str_replace('/', '\\/', $value) . '*';
+            // be tolerant to devs forgetting 1st and last slash
+            $value = '/' . trim($value, '/') . '/';
+            $result[] = 'meta_path_string_ms:' . $this->escapeValue($value) . '*';
         }
 
         return count($result) == 1 ? $result[0] : array_unshift($result, 'OR');

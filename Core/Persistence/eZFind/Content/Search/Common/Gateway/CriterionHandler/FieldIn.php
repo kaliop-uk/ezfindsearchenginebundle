@@ -13,21 +13,19 @@ class FieldIn extends FieldBase
 {
     public function accept(Criterion $criterion)
     {
-        return $criterion instanceof Criterion\Field &&
-            in_array($criterion->operator, [Operator::IN, Operator::EQ, Operator::CONTAINS]);
+        return $criterion instanceof Criterion\Field;
     }
 
     public function handle(CriteriaConverter $converter, Criterion $criterion)
     {
         $fieldName = $this->determineFieldName($criterion->target);
-        $criterionValue = $criterion->value;
 
-        if (!is_array($criterionValue)) {
-            return $fieldName . ':' . $criterionValue;
+        $valueList = (array)$criterion->value;
+
+        foreach ($valueList as &$value) {
+            $value = $this->escapeValue($value);
         }
 
-        return $fieldName . ':(' . implode(
-                $criterionValue, ' '
-            ) . ')';
+        return $fieldName . ':(' . implode($criterionValue, ' ') . ')';
     }
 }

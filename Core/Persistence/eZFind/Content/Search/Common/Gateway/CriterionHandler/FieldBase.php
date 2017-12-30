@@ -11,7 +11,6 @@ abstract class FieldBase extends CriterionHandler
 
     public function __construct(\Closure $legacyKernelClosure)
     {
-        // Override the base constructor
         $this->legacyKernelClosure = $legacyKernelClosure;
     }
 
@@ -25,29 +24,15 @@ abstract class FieldBase extends CriterionHandler
         return $legacyKernelClosure();
     }
 
-    /// @todo refactor this
+    /// @todo do we really need to use a runCallback call here ?
     protected function determineFieldName($fieldName)
     {
-        $fieldDefinition = explode('/', $fieldName);
-        switch (count($fieldDefinition)) {
-            case 1:
-                return $fieldName;
-            case 2:
-                // If the field is a taxonomy field, we need to query the id directly
-                // The only way to accomplish this is to force the correct fieldname, which we can only get
-                // when generating a facet field (which makes sense, but we're also filtering against facets).
-                // Why doesn't ezfind handle this better?
-                $contentClassAttributeId = \eZContentObjectTreeNode::classAttributeIDByIdentifier($fieldName);
-                $contentClassAttribute = \eZContentClassAttribute::fetch($contentClassAttributeId);
-                if ($contentClassAttribute->attribute('data_type_string') == 'eztaxonomy') {
-                    $fieldName = $this->getLegacyKernel()->runCallback(
-                        function () use ($fieldName) {
-                            return \eZSolr::getFieldName($fieldName, false, 'facet');
-                        },
-                        false
-                    );
-                }
-        }
+        $fieldName = $this->getLegacyKernel()->runCallback(
+            function () use ($fieldName) {
+                return \eZSolr::getFieldName($fieldName, false, 'facet');
+            },
+            false
+        );
 
         return $fieldName;
     }

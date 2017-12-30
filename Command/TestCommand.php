@@ -156,11 +156,17 @@ echo "---\n";
 
         $query = new KQuery();
         $query->query = new Criterion\LogicalOr([
-            new Criterion\ContentTypeIdentifier('article'),
+            new Criterion\LogicalAnd([
+                new Criterion\ContentTypeIdentifier('fs_article'),
+                new Criterion\Subtree('/1/2/'),
+                new Criterion\ParentLocationId(128),
+                new Criterion\FullText('spuerscript'),
+            ]),
             new Criterion\ContentTypeIdentifier('folder'),
             new Criterion\LogicalAnd([
                 new Criterion\SectionId(1),
-                new Criterion\ContentId(5)
+                new Criterion\ContentId(5),
+                new Criterion\RemoteId('abcdefg:ka and bb:cc'),
             ])
         ]);
 

@@ -9,11 +9,11 @@ use Kaliop\EzFindSearchEngineBundle\Persistence\Solr\Content\Search\CriterionVis
 
 class FieldLike extends FieldBase
 {
+    // don't allow if is not a text field.
     public function accept(Criterion $criterion)
     {
         $solrFieldName = \eZSolr::getFieldName($criterion->target);
 
-        // don't allow if is not a text field.
         return
             ($criterion instanceof Criterion\Field) &&
             ($criterion->operator === Criterion\Operator::LIKE) &&

@@ -17,17 +17,6 @@ class LogicalOr extends CriterionHandler
 
     public function handle(CriteriaConverter $converter, Criterion $criterion)
     {
-        /*return '(' .
-            implode(
-                ' OR ',
-                array_map(
-                    function ($value) use ($converter) {
-                        return $converter->handle($value);
-                    },
-                    $criterion->criteria
-                )
-            ) .
-            ')';*/
         return array_merge(
             array('OR'),
             array_map(

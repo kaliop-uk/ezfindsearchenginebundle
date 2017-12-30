@@ -20,8 +20,7 @@ class RemoteId extends CriterionHandler
         $valueList = (array)$criterion->value;
 
         foreach ($valueList as $value) {
-            /// @todo is this correct, or should it be meta_remote_id_ms ?
-            $result[] = 'remote_id:' . $value;
+            $result[] = 'remote_id:' . $this->escapeValue($value);
         }
 
         return count($result) == 1 ? $result[0] : array_unshift($result, 'OR');

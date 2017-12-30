@@ -1,27 +1,4 @@
 services:
-    # Logical
-    ezfind_search_engine.content.criterion_handler.logical_and:
-        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\LogicalAnd
-        tags:
-            - {name: ezfind_search_engine.content.criterion_handler.filter}
-
-    ezfind_search_engine.content.criterion_handler.logical_not:
-        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\LogicalNot
-        tags:
-            - {name: ezfind_search_engine.content.criterion_handler.filter}
-
-    ezfind_search_engine.content.criterion_handler.logical_or:
-        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\LogicalOr
-        tags:
-            - {name: ezfind_search_engine.content.criterion_handler.filter}
-
-    # Query String
-    ezfind_search_engine.content.criterion_handler.full_text:
-        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\FullText
-        tags:
-            - {name: ezfind_search_engine.content.criterion_handler.query_string}
-
-    # Filter
 
     ezfind_search_engine.content.criterion_handler.content_id:
         class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\ContentId
@@ -40,6 +17,26 @@ services:
 
     ezfind_search_engine.content.criterion_handler.content_type_identifier:
         class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\ContentTypeIdentifier
+        tags:
+            - {name: ezfind_search_engine.content.criterion_handler.filter}
+
+    ezfind_search_engine.content.criterion_handler.full_text:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\FullText
+        tags:
+            - {name: ezfind_search_engine.content.criterion_handler.filter}
+
+    ezfind_search_engine.content.criterion_handler.logical_and:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\LogicalAnd
+        tags:
+            - {name: ezfind_search_engine.content.criterion_handler.filter}
+
+    ezfind_search_engine.content.criterion_handler.logical_not:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\LogicalNot
+        tags:
+            - {name: ezfind_search_engine.content.criterion_handler.filter}
+
+    ezfind_search_engine.content.criterion_handler.logical_or:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\LogicalOr
         tags:
             - {name: ezfind_search_engine.content.criterion_handler.filter}
 
@@ -66,15 +63,15 @@ services:
     ezfind_search_engine.content.criterion_handler.field_in:
         class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\FieldIn
         arguments:
-        # @todo why are we injecting 'kernel.lazy' ?
-          - '@ezpublish_legacy.kernel.lazy'
+            # @todo why are we injecting 'kernel.lazy' ?
+            - '@ezpublish_legacy.kernel.lazy'
         tags:
             - {name: ezfind_search_engine.content.criterion_handler.filter}
 
     ezfind_search_engine.content.criterion_handler.field_like:
         class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\FieldLike
         arguments:
-        # @todo why are we injecting 'kernel.lazy' ?
-          - '@ezpublish_legacy.kernel.lazy'
+            # @todo why are we injecting 'kernel.lazy' ?
+            - '@ezpublish_legacy.kernel.lazy'
         tags:
             - {name: ezfind_search_engine.content.criterion_handler.filter}

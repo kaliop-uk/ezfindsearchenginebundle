@@ -5,20 +5,22 @@ namespace Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
 use Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriteriaConverter;
 use Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler;
-use eZ\Publish\API\Repository\Values\Content\Query\Criterion\FullText as BaseFullText;
 
 class FullText extends CriterionHandler
 {
     public function accept(Criterion $criterion)
     {
-        return $criterion instanceof BaseFullText;
+        return $criterion instanceof Criterion\FullText;
     }
 
-    /// @todo fix this
+    /**
+     * @todo check if we do respect the matching logic as described in class Criterion\Field:
+     *       - do NOT escape wildcards
+     *       - default to AND instead of OR for separate words
+     */
     public function handle(CriteriaConverter $converter, Criterion $criterion)
     {
-        // Sanitize the value
-        $cleanSearchQuery = preg_replace('/["]?([[:alpha:]]{2}\d{3}\-\d{6})["]?/', '"$1"', $criterion->value);
-        return $cleanSearchQuery;
+        // Fulltext only accepts 1 value
+        return 'ezf_df_text:'.$this->escapeValue($criterion->value);
     }
 }

@@ -21,7 +21,7 @@ class ContentTypeId extends CriterionHandler
         $valueList = (array)$criterion->value;
 
         foreach ($valueList as $value) {
-            $result[] = 'contentclass_id:' . $value;
+            $result[] = 'contentclass_id:' . $this->escapeValue($value);
         }
 
         return count($result) == 1 ? $result[0] : array_unshift($result, 'OR');

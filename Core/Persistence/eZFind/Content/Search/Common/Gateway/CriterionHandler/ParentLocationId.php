@@ -22,8 +22,7 @@ class ParentLocationId extends CriterionHandler
         $valueList = (array)$criterion->value;
 
         foreach ($valueList as $value) {
-            /// @todo
-            $result[] = '...:' . $value;
+            $result[] = 'meta_path_string_ms:/\\/([0-9]+\\/)+' . $this->escapeValue($value) . '\\/[0-9]+\\//';
         }
 
         return count($result) == 1 ? $result[0] : array_unshift($result, 'OR');

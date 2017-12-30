@@ -6,6 +6,8 @@
 
 * check behaviour of all existing sort converters
 
+* check how well scoring works given that we match using 'fq' instead of 'q' by default
+
 * check list of all missing criteria converters compared to std search service (for Content searches)
   - contenttypegroup: can not do
   - datemetadata: todo
@@ -18,10 +20,6 @@
   - permissionSubtree: ?
   - visibility: ?
 
-* add new criteria based on data available in ezfind (solr):
-  - raw solr filter
-  - other ?
-
 * check list of all missing sort converters compared to std search service (for Content searches)
   - contentId
   - mapLocationName
@@ -29,6 +27,10 @@
   - sectionIdentifier
   - locationDepth (using main location I presume ?)
   - LocationPathString (using main location I presume ?)
+
+* add new criteria based on data available in ezfind (solr):
+  - raw solr filter
+  - other ?
 
 * add new sort converters based on data available in ezfind (solr) ?
 

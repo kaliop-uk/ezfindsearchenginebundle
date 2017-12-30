@@ -263,11 +263,21 @@ class SearchService implements SearchServiceInterface
             'boost_functions' => $this->extractLegacyParameter('boost_functions', $query),
         ];
 
+        /// @todo check how scoring is affected by using 'fq' vs. 'q':
+        ///       - if 'fq' doesnot affect scoring, we should generate $searchParameters['query'] for $query->criterion
+        ///       - which in turns means that we would need to be able to generate a string, not an array :-(
         if ($query->criterion) {
-            //
             $searchParameters['query'] = ''; // seems to work well enough - we put everything in the filter...
             $searchParameters['filter'] = $this->extractFilter($query->criterion);
-            //$searchParameters['facet'] = array_merge($this->generateBaseFacets(), $this->extractFacetFilter($criterion));
+            //$searchParameters['facet'] = array_merge($this->generateBaseFacets(), $this->extractFacetFilter($query->criterion));
+        }
+
+        if ($query->filter) {
+            if (!isset($searchParameters['filter'])) {
+                $searchParameters['filter'] = array();
+            }
+            $searchParameters['filter'] = array_merge($searchParameters['filter'], $this->extractFilter($query->filter));
+            //$searchParameters['facet'] = array_merge($this->generateBaseFacets(), $this->extractFacetFilter($query->filter));
         }
 
         if ($query->sortClauses) {

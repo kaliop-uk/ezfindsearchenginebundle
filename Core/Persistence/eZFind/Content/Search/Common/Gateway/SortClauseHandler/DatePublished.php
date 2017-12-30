@@ -15,7 +15,7 @@ class DatePublished extends SortClauseHandler
     public function handle(SortClause $sortClause)
     {
         return [
-            'published' => trim($this->getDirection($sortClause)),
+            'published' => $this->getDirection($sortClause),
         ];
     }
 }

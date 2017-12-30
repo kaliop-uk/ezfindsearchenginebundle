@@ -16,7 +16,7 @@ class LocationPriority extends SortClauseHandler
     public function handle(SortClause $sortClause)
     {
         return [
-            'main_node_meta_priority_si' => trim($this->getDirection($sortClause)),
+            'main_node_meta_priority_si' => $this->getDirection($sortClause),
         ];
     }
 }

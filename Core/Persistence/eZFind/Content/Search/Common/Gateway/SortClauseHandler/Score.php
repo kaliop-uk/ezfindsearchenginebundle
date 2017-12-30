@@ -16,7 +16,7 @@ class Score extends SortClauseHandler
     public function handle(SortClause $sortClause)
     {
         return [
-            'score' => trim($this->getDirection($sortClause)),
+            'score' => $this->getDirection($sortClause),
         ];
     }
 }

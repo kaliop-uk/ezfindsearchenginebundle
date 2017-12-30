@@ -15,7 +15,7 @@ class DateModified extends SortClauseHandler
     public function handle(SortClause $sortClause)
     {
         return [
-            'modified' => trim($this->getDirection($sortClause)),
+            'modified' => $this->getDirection($sortClause),
         ];
     }
 }

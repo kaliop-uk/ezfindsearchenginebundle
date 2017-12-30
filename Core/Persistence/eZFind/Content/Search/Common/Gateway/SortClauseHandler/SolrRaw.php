@@ -17,7 +17,7 @@ class SolrRaw extends SortClauseHandler
     {
         $fieldIdentifier = $sortClause->target;
         return [
-            $fieldIdentifier => trim($this->getDirection($sortClause)),
+            $fieldIdentifier => $this->getDirection($sortClause),
         ];
     }
 }

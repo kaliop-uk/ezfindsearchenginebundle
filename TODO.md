@@ -23,6 +23,12 @@
   - other ?
 
 * check list of all missing sort converters compared to std search service (for Content searches)
+  - contentId
+  - mapLocationName
+  - sectionName
+  - sectionIdentifier
+  - locationDepth (using main location I presume ?)
+  - LocationPathString (using main location I presume ?)
 
 * add new sort converters based on data available in ezfind (solr) ?
 

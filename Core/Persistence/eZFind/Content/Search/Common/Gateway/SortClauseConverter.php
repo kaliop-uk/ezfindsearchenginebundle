@@ -11,7 +11,7 @@ class SortClauseConverter extends Converter
      * @param SortClause $sortClause
      * @return bool
      */
-    public function accept(SortClause $sortClause)
+    public function canHandle(SortClause $sortClause)
     {
         /** @var SortClauseHandler $handler */
         foreach ($this->handlers as $handler) {

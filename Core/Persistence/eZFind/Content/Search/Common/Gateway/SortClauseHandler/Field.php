@@ -16,7 +16,7 @@ class Field extends SortClauseHandler
     {
         $fieldIdentifier = $sortClause->targetData->typeIdentifier . '/' . $sortClause->targetData->fieldIdentifier;
         return [
-            $fieldIdentifier => trim($this->getDirection($sortClause)),
+            $fieldIdentifier => $this->getDirection($sortClause),
         ];
     }
 }

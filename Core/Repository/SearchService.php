@@ -323,23 +323,27 @@ class SearchService implements SearchServiceInterface
         return ($query instanceof KaliopQuery) ? !$query->returnRawData : $this->defaultReturnObjects;
     }
 
-    protected function extractFilter($criterion)
+    /**
+     * @param Query\Criterion|Query\Criterion[] $criteria
+     * @return array
+     * @throws NotImplementedException
+     */
+    protected function extractFilter($criteria)
     {
-        if (!is_array($criterion)) {
-            $criterion = [$criterion];
+        if (!is_array($criteria)) {
+            $criteria = array($criteria);
         }
 
         $result = [];
-        foreach ($criterion as $index => $filter) {
-            if ($this->filterCriteriaConverter->canHandle($filter)) {
-                $result[] = $this->filterCriteriaConverter->handle($filter);
-            }
+
+        foreach ($criteria as $criterion) {
+            $result[] = $this->filterCriteriaConverter->handle($criterion);
         }
 
         return $result;
     }
 
-    protected function extractSort($sortClauses = [])
+    protected function extractSort($sortClauses)
     {
         $result = [];
 

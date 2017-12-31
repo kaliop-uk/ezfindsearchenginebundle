@@ -14,8 +14,6 @@
   - languagecode: todo
   - maplocationdistance: todo
   - usermetadata: todo
-  - locationId: todo
-  - locationPriority: todo
   - locationRemoteId: can not do
   - permissionSubtree: ?
   - visibility: ?
@@ -33,6 +31,8 @@
   - other ?
 
 * add new sort converters based on data available in ezfind (solr) ?
+
+* decide what to do with parameter '$fieldFilters' for findContent and findSingle
 
 * add unit tests (with travis and kaliop mig bundle for loading sample content) 
 

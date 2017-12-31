@@ -88,7 +88,7 @@ class SearchService implements SearchServiceInterface
     }
 
     /**
-     * @todo fill in the remaining members: time, timedOut, spellSuggestion
+     * @todo fill in the remaining members: timedOut, spellSuggestion
      *
      * @param Query $query
      * @param array $fieldFilters
@@ -97,8 +97,6 @@ class SearchService implements SearchServiceInterface
      */
     public function findContent(Query $query, array $fieldFilters = [], $filterOnUserPermissions = true)
     {
-        $query = clone $query;
-
         $result = $this->performSearch($query, $fieldFilters, $filterOnUserPermissions);
 
         $maxScore = null;
@@ -135,10 +133,13 @@ class SearchService implements SearchServiceInterface
         );
     }
 
+    /**
+     * @todo Implement this method shrinking the fieldstoreturn to the bare minimum needed to build contentInfo
+     *       without having to query the database
+     * @since 5.4.5
+     */
     public function findContentInfo(Query $query, array $languageFilter = [], $filterOnUserPermissions = true)
     {
-        /// @todo Implement this method shrinking the fieldstoreturn to the bare minimum needed to build contentInfo
-        ///       without having to query the database
         throw new NotImplementedException('Intentionally not implemented');
     }
 

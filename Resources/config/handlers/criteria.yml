@@ -25,6 +25,16 @@ services:
         tags:
             - {name: ezfind_search_engine.content.criterion_handler.filter}
 
+    ezfind_search_engine.content.criterion_handler.location_id:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\LocationId
+        tags:
+            - {name: ezfind_search_engine.content.criterion_handler.filter}
+
+    ezfind_search_engine.content.criterion_handler.location_priority:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\LocationPriority
+        tags:
+            - {name: ezfind_search_engine.content.criterion_handler.filter}
+
     ezfind_search_engine.content.criterion_handler.logical_and:
         class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\LogicalAnd
         tags:

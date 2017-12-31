@@ -17,7 +17,6 @@
   - visibility: ?
 
 * check list of all missing sort converters compared to std search service (for Content searches)
-  - contentId
   - mapLocationName
   - sectionName
   - sectionIdentifier

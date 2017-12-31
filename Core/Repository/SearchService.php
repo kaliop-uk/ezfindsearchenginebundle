@@ -264,25 +264,35 @@ class SearchService implements SearchServiceInterface
             'boost_functions' => $this->extractLegacyParameter('boost_functions', $query),
         ];
 
-        /// @todo check how scoring is affected by using 'fq' vs. 'q':
-        ///       - if 'fq' doesnot affect scoring, we should generate $searchParameters['query'] for $query->criterion
-        ///       - which in turns means that we would need to be able to generate a string, not an array :-(
+        $scoreSort = false;
+        if ($query->sortClauses) {
+            $searchParameters['sort_by'] = $this->extractSort($query->sortClauses);
+
+            if (array_key_exists('score', $searchParameters['sort_by'])) {
+                $scoreSort = true;
+            }
+        }
+
+        $criterionFilter = array();
         if ($query->criterion) {
-            $searchParameters['query'] = ''; // seems to work well enough - we put everything in the filter...
-            $searchParameters['filter'] = $this->extractFilter($query->criterion);
+            $criterionFilter = $this->extractFilter($query->criterion);
             //$searchParameters['facet'] = array_merge($this->generateBaseFacets(), $this->extractFacetFilter($query->criterion));
         }
 
+        $filterFilter = array();
         if ($query->filter) {
-            if (!isset($searchParameters['filter'])) {
-                $searchParameters['filter'] = array();
-            }
-            $searchParameters['filter'] = array_merge($searchParameters['filter'], $this->extractFilter($query->filter));
+            $filterFilter = $this->extractFilter($query->filter);
             //$searchParameters['facet'] = array_merge($this->generateBaseFacets(), $this->extractFacetFilter($query->filter));
         }
 
-        if ($query->sortClauses) {
-            $searchParameters['sort_by'] = $this->extractSort($query->sortClauses);
+        if ($scoreSort) {
+            // since we are sorting by score, we need to generate the solr query, as that is what is used to calculate score
+            $searchParameters['query'] = $this->generateQueryString($criterionFilter);
+            $searchParameters['filter'] = $filterFilter;
+        } else {
+            // since we are not sorting by score, no need to do complex stuff. Only use a solr filter, which should be fatster
+            $searchParameters['query'] = '';
+            $searchParameters['filter'] = array_merge($criterionFilter, $filterFilter);
         }
 
         // If we need to filter on permissions, set this to null so eZFind will fill it in.
@@ -314,6 +324,25 @@ class SearchService implements SearchServiceInterface
             case 'query_handler':
                 return ($query instanceof KaliopQuery) ? $query->queryHandler : 'ezpublish';
         }
+    }
+
+    /**
+     * Given a Solr filter in array form (as passed to ezfeZPSolrQueryBuilder), return its string representtaion
+     * @param array $filter
+     * @return string
+     * @throws NotImplementedException
+     *
+     * @todo allow class ezfeZPSolrQueryBuilder to be specified via settings
+     */
+    protected function generateQueryString($filter)
+    {
+        // build the Solr query string via ezfind - we have to resort to
+        // a hackish way to access a protected method in ezfeZPSolrQueryBuilder
+        $queryBuilderClass = '\ezfeZPSolrQueryBuilder';
+        /** @var \ezfeZPSolrQueryBuilder $queryBuilder */
+        $queryBuilder = new $queryBuilderClass(null);
+        $filterCreator = Closure::bind(function($filter){return $this->getParamFilterQuery(array('Filter' => $filter));}, $queryBuilder, $queryBuilder);
+        return $filterCreator($filter);
     }
 
     /**

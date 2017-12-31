@@ -6,8 +6,6 @@
 
 * check behaviour of all existing sort converters
 
-* check how well scoring works given that we match using 'fq' instead of 'q' by default
-
 * check list of all missing criteria converters compared to std search service (for Content searches)
   - contenttypegroup: can not do
   - datemetadata: fails with operator IN

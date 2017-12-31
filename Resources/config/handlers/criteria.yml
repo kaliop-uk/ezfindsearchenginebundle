@@ -20,6 +20,11 @@ services:
         tags:
             - {name: ezfind_search_engine.content.criterion_handler.filter}
 
+    ezfind_search_engine.content.criterion_handler.date_metadata:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\DateMetadata
+        tags:
+            - {name: ezfind_search_engine.content.criterion_handler.filter}
+
     ezfind_search_engine.content.criterion_handler.full_text:
         class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\FullText
         tags:

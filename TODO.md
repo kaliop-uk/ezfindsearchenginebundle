@@ -10,7 +10,7 @@
 
 * check list of all missing criteria converters compared to std search service (for Content searches)
   - contenttypegroup: can not do
-  - datemetadata: todo
+  - datemetadata: fails with operator IN
   - languagecode: todo
   - maplocationdistance: todo
   - usermetadata: todo

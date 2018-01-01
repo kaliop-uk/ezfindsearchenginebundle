@@ -24,6 +24,16 @@ services:
         tags:
             - {name: ezfind_search_engine.content.sort_clause_handler}
 
+    ezfind_search_engine.content.sort_clause_handler.location_depth:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\SortClauseHandler\LocationDepth
+        tags:
+            - {name: ezfind_search_engine.content.sort_clause_handler}
+
+    ezfind_search_engine.content.sort_clause_handler.location_path_string:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\SortClauseHandler\LocationPathString
+        tags:
+            - {name: ezfind_search_engine.content.sort_clause_handler}
+
     ezfind_search_engine.content.sort_clause_handler.location_priority:
         class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\SortClauseHandler\LocationPriority
         tags:

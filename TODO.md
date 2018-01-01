@@ -1,7 +1,5 @@
 * fix behaviour for when the value for a criterion has a space in it (is it the same for fulltext vs eg. remote_id ?)
 
-* check behaviour of all existing sort converters
-
 * check list of all missing criteria converters compared to std search service (for Content searches)
   - contenttypegroup: can not do
   - datemetadata: fails with operator IN
@@ -16,8 +14,6 @@
   - mapLocationName
   - sectionName
   - sectionIdentifier
-  - locationDepth (using main location I presume ?)
-  - LocationPathString (using main location I presume ?)
 
 * add new criteria based on data available in ezfind (solr):
   - other ?

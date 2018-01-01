@@ -5,15 +5,14 @@
   - datemetadata: fails with operator IN
   - languagecode: todo
   - maplocationdistance: todo
-  - usermetadata: todo
   - locationRemoteId: can not do
   - permissionSubtree: ?
   - visibility: ?
 
 * check list of all missing sort converters compared to std search service (for Content searches)
   - mapLocationName
-  - sectionName
-  - sectionIdentifier
+  - sectionName: can not do
+  - sectionIdentifier: can not do
 
 * add new criteria based on data available in ezfind (solr):
   - other ?

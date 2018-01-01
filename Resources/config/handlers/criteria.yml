@@ -87,6 +87,11 @@ services:
         tags:
             - {name: ezfind_search_engine.content.criterion_handler.filter}
 
+    ezfind_search_engine.content.criterion_handler.usermetadata:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\UserMetadata
+        tags:
+            - {name: ezfind_search_engine.content.criterion_handler.filter}
+
     #ezfind_search_engine.content.criterion_handler.field_in:
     #    class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\FieldIn
     #    arguments:

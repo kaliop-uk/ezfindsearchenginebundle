@@ -287,7 +287,7 @@ class SearchService implements SearchServiceInterface
 
         if ($scoreSort) {
             // since we are sorting by score, we need to generate the solr query, as that is what is used to calculate score
-            $searchParameters['query'] = $this->generateQueryString($criterionFilter);
+            $searchParameters['query'] = $this->filterCriteriaConverter->generateQueryString($criterionFilter);
             $searchParameters['filter'] = $filterFilter;
         } else {
             // since we are not sorting by score, no need to do complex stuff. Only use a solr filter, which should be fatster
@@ -324,25 +324,6 @@ class SearchService implements SearchServiceInterface
             case 'query_handler':
                 return ($query instanceof KaliopQuery) ? $query->queryHandler : 'ezpublish';
         }
-    }
-
-    /**
-     * Given a Solr filter in array form (as passed to ezfeZPSolrQueryBuilder), return its string representtaion
-     * @param array $filter
-     * @return string
-     * @throws NotImplementedException
-     *
-     * @todo allow class ezfeZPSolrQueryBuilder to be specified via settings
-     */
-    protected function generateQueryString($filter)
-    {
-        // build the Solr query string via ezfind - we have to resort to
-        // a hackish way to access a protected method in ezfeZPSolrQueryBuilder
-        $queryBuilderClass = '\ezfeZPSolrQueryBuilder';
-        /** @var \ezfeZPSolrQueryBuilder $queryBuilder */
-        $queryBuilder = new $queryBuilderClass(null);
-        $filterCreator = Closure::bind(function($filter){return $this->getParamFilterQuery(array('Filter' => $filter));}, $queryBuilder, $queryBuilder);
-        return $filterCreator($filter);
     }
 
     /**

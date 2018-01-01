@@ -18,7 +18,6 @@ class LogicalNot extends CriterionHandler
         return $criterion instanceof Criterion\LogicalNot;
     }
 
-    /// @todo fix this
     public function handle(CriteriaConverter $converter, Criterion $criterion)
     {
         if (!isset($criterion->criteria[0]) ||
@@ -27,8 +26,10 @@ class LogicalNot extends CriterionHandler
             throw new InvalidCriterionException("LogicalNot can receive one criterion only");
         }
 
-        $result = trim($converter->handle($criterion->criteria[0]),'()');
-        $result = '-' . preg_replace('%(AND |OR )%', '$1-', $result);
+        $subfilter = (array)$converter->handle($criterion->criteria[0]);
+        $subfilter = $converter->generateQueryString($subfilter);
+        $result = 'NOT(' . $subfilter . ')';
+
         return $result;
     }
 }

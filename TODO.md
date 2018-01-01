@@ -1,8 +1,5 @@
 * fix behaviour for when the value for a criterion has a space in it (is it the same for fulltext vs eg. remote_id ?)
 
-* check behaviour of all existing criteria
-  - logicalNot: todo (is it possible at all ?)
-
 * check behaviour of all existing sort converters
 
 * check list of all missing criteria converters compared to std search service (for Content searches)

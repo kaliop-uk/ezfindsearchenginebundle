@@ -16,9 +16,6 @@ You can install the bundle using Composer:
 The bundle comes fully configured by default. Here is an example of the complete list of parameters available:
 
 ```yaml
-    # in case you want to use an alternative 'legacy fetch function'. The default is ezfind/search
-    ezfind_search_engine.search_settings.legacy_function_handler.module_name: 'ezfind'
-    ezfind_search_engine.search_settings.legacy_function_handler.function_name: 'search'
     ezfind_search_engine.search_settings.boost_functions:
         - 'recip(ms(NOW/HOUR,attr_publication_date_dt),4e-12,1000,2)'
     # default list of fields returned when *not* returning Contents
@@ -28,6 +25,9 @@ The bundle comes fully configured by default. Here is an example of the complete
         - meta_path_string_ms
         - meta_priority_si
         - meta_score_value:score # Score field needs to be renamed as it won't be passed from eZFind
+    # in case you want to use an alternative 'legacy fetch function'. The default is ezfind/search
+    ezfind_search_engine.search_settings.legacy_function_handler.module_name: 'ezfind'
+    ezfind_search_engine.search_settings.legacy_function_handler.function_name: 'search'
 ```
 
 
@@ -52,18 +52,19 @@ query parameters, f.e. to speed up the execution of the query by disabling unnee
 
 ### Tagged Services / Criteria
 
-The bundle utilises a series of 'handlers' to convert the search Query and its criteria into legacy search
-configuration to be sent to Solr.
+The bundle utilises a series of 'handlers' to convert the search Query into legacy search configuration to be sent to
+Solr.
 
 You can add more custom handlers using tagged services, with the following tags:
 
-#### ezfind_search_engine.content.criterion_handler.query_string
+#### `ezfind_search_engine.content.criterion_handler.filter`
 
-Criteria that will generate a Solr query string
+These are supposed to convert criteria that will be added to the "filter" section of the eZFind call (or to the query
+string when sorting by score)
 
-#### ezfind_search_engine.content.criterion_handler.filter
+#### `ezfind_search_engine.content.sort_clause_handler`
 
-The rest of the criteria will be added to the "filter" section of the eZFind call
+These are supposed to convert sort clauses 
 
 
 ## Troubleshooting
@@ -82,7 +83,16 @@ The rest of the criteria will be added to the "filter" section of the eZFind cal
    A2: this bundle does not overtake the standard Search service from the eZPublish repository. It is up to the developer
        to decide which queries to send to the database and which ones to send to SOLR.
 
+* Why do I see the same `score` for all results?
+  A: when you are not sorting results by score, the bundle optimizes performances by using a pure 'filter query' for the
+     Solr request (this should be good because Solr caches filters). This means that all search hits get the same score. 
+
+* Is there any difference between using `$query->filter` and `$query->query`?
+  A: when you are not sorting results by score, none.
+     When you are sorting results by score, you should use for optimal performaces `$query->query` for all criteria that
+     influence the scoring (eg. a search term), and `$query->filter` for all other criteria (eg limitations on content
+     type, section, etc...) 
+
 * I tried using the new search service in a command line script but I always get back no results
   A: there is a bug in the way the eZPublish legacy kernel is booted in command line scripts. We provide as courtesy
      an alternative implementation that can be activated by editing the services
-  

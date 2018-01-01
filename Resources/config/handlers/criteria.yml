@@ -25,6 +25,13 @@ services:
         tags:
             - {name: ezfind_search_engine.content.criterion_handler.filter}
 
+    ezfind_search_engine.content.criterion_handler.field:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\Field
+        arguments:
+            - '@ezpublish_legacy.kernel'
+        tags:
+            - {name: ezfind_search_engine.content.criterion_handler.filter}
+
     ezfind_search_engine.content.criterion_handler.full_text:
         class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\FullText
         tags:
@@ -75,18 +82,18 @@ services:
         tags:
             - {name: ezfind_search_engine.content.criterion_handler.filter}
 
-    ezfind_search_engine.content.criterion_handler.field_in:
-        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\FieldIn
-        arguments:
-            # @todo why are we injecting 'kernel.lazy' ?
-            - '@ezpublish_legacy.kernel.lazy'
-        tags:
-            - {name: ezfind_search_engine.content.criterion_handler.filter}
+    #ezfind_search_engine.content.criterion_handler.field_in:
+    #    class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\FieldIn
+    #    arguments:
+    #        # @todo why are we injecting 'kernel.lazy' ?
+    #        - '@ezpublish_legacy.kernel.lazy'
+    #    tags:
+    #        - {name: ezfind_search_engine.content.criterion_handler.filter}
 
-    ezfind_search_engine.content.criterion_handler.field_like:
-        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\FieldLike
-        arguments:
-            # @todo why are we injecting 'kernel.lazy' ?
-            - '@ezpublish_legacy.kernel.lazy'
-        tags:
-            - {name: ezfind_search_engine.content.criterion_handler.filter}
+    #ezfind_search_engine.content.criterion_handler.field_like:
+    #    class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\FieldLike
+    #    arguments:
+    #        # @todo why are we injecting 'kernel.lazy' ?
+    #        - '@ezpublish_legacy.kernel.lazy'
+    #    tags:
+    #        - {name: ezfind_search_engine.content.criterion_handler.filter}

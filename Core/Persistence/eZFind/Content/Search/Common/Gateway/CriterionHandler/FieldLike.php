@@ -7,6 +7,7 @@ use Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Commo
 use Kaliop\EzFindSearchEngineBundle\Persistence\Solr\Content\Search\CriterionVisitor;
 use Kaliop\EzFindSearchEngineBundle\Persistence\Solr\Content\Search\CriterionVisitorDispatcher;
 
+/// @deprecated
 class FieldLike extends FieldBase
 {
     // don't allow if is not a text field.

@@ -1,7 +1,6 @@
 * fix behaviour for when the value for a criterion has a space in it (is it the same for fulltext vs eg. remote_id ?)
 
 * check behaviour of all existing criteria
-  - field*: todo: sort out current situation with 2 separate converters
   - logicalNot: todo (is it possible at all ?)
 
 * check behaviour of all existing sort converters

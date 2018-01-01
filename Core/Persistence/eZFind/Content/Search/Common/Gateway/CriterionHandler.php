@@ -49,9 +49,4 @@ abstract class CriterionHandler implements Handler
     {
         return strftime('%Y-%m-%dT%H:%M:%SZ', $value);
     }
-
-    protected function formatDateByRef(&$value)
-    {
-        $value = strftime('%Y-%m-%dT%H:%M:%SZ', $value);
-    }
 }

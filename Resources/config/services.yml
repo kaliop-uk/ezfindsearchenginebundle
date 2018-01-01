@@ -63,7 +63,7 @@ services:
             - '@ezfind_search_engine.content.sort_clause_converter'
             - '%ezfind_search_engine.search_settings.boost_functions%'
             - '%ezfind_search_engine.search_settings.fields_to_return%'
-            - true
+            - 'contents'
             - '%ezfind_search_engine.search_settings.legacy_function_handler.module_name%'
             - '%ezfind_search_engine.search_settings.legacy_function_handler.function_name%'
             - '@logger'

@@ -52,7 +52,7 @@ class SearchService implements SearchServiceInterface
 
     protected $defaultFieldsToReturn;
 
-    protected $defaultReturnObjects;
+    protected $defaultReturnType;
 
     /** @var LoggerInterface */
     protected $logger;
@@ -65,15 +65,15 @@ class SearchService implements SearchServiceInterface
         SortClauseConverter $sortClauseConverter,
         $defaultBoostFunctions,
         $defaultFieldsToReturn,
-        $defaultReturnObjects,
-        $ezFindModule,
-        $ezFindFunction,
+        $defaultReturnType = KaliopQuery::RETURN_CONTENTS,
+        $ezFindModule = 'ezfind',
+        $ezFindFunction = 'search',
         LoggerInterface $logger = null
     ) {
         $this->legacyKernelClosure = $legacyKernelClosure;
         $this->contentService = $contentService;
         $this->contentTypeService = $contentTypeService;
-        $this->defaultReturnObjects = $defaultReturnObjects;
+        $this->defaultReturnType = $defaultReturnType;
         $this->ezFindModule = $ezFindModule;
         $this->ezFindFunction = $ezFindFunction;
         $this->logger = $logger;
@@ -118,7 +118,12 @@ class SearchService implements SearchServiceInterface
                 $maxScore = $resultArray['response']['maxScore'];
             }
 
-            /// @todo optimize: remove from SearchExtras 'response' to save memory using the 'Closure::bind' hack
+            // optimize: remove from SearchExtras 'response' to save memory using the 'Closure::bind' hack
+            /// @todo (!important) make the cutover limit configurable
+            if ($result['SearchCount'] > 100) {
+                $resultsCleaner = Closure::bind(function(){unset($this->ResultArray['response']['docs']);}, $extras, $extras);
+                $resultsCleaner();
+            }
         }
 
         return new KaliopSearchResult(
@@ -191,20 +196,20 @@ class SearchService implements SearchServiceInterface
      * @param Query $query
      * @param array $fieldFilters
      * @param bool $filterOnUserPermissions
-     * @param null|bool $forceReturnObjects when set, it overrides both the service default and the query default
+     * @param null|string $forceReturnObjects when set, it overrides both the service default and the query default
      * @return array the same as returned by \eZSolr::Search(), with added members SearchHits and Facets
      */
     protected function performSearch(
         Query $query,
         array $fieldFilters,
         $filterOnUserPermissions,
-        $forceReturnObjects = null
+        $forceReturnType = null
     ) {
-        $returnObjects = $this->shouldReturnObjects($query, $forceReturnObjects);
+        $returnType = $this->getReturnType($query, $forceReturnType);
 
         $this->initializeQueryLimit($query);
 
-        $searchParameters = $this->getLegacySearchParameters($query, $fieldFilters, $filterOnUserPermissions, $returnObjects);
+        $searchParameters = $this->getLegacySearchParameters($query, $fieldFilters, $filterOnUserPermissions, $returnType);
 
         /** @var array $searchResult */
         $searchResult = $this->getLegacyKernel()->runCallback(
@@ -216,7 +221,7 @@ class SearchService implements SearchServiceInterface
 
         $this->logSearchErrors($searchResult);
 
-        $searchResult['SearchHits'] = $this->buildResultObjects($searchResult['SearchResult'], $returnObjects);
+        $searchResult['SearchHits'] = $this->buildResultObjects($searchResult, $returnType);
 
         //$searchResult['Facets'] = $this->buildResultFacets($searchResult['SearchExtras']);
 
@@ -245,17 +250,17 @@ class SearchService implements SearchServiceInterface
      * @param Query $query
      * @param array $fieldFilters
      * @param bool $filterOnUserPermissions
-     * @param bool $returnObjects
+     * @param string $returnType
      * @return array
      */
-    protected function getLegacySearchParameters(Query $query, array $fieldFilters, $filterOnUserPermissions, $returnObjects)
+    protected function getLegacySearchParameters(Query $query, array $fieldFilters, $filterOnUserPermissions, $returnType)
     {
         $searchParameters = [
             'offset' => $query->offset,
             'limit' => $query->limit,
             // When we are rebuilding eZ5 objects, no need to load custom fields from Solr.
             // This 'hack' is the way to get ezfind to generate the minimum field list, plus the score
-            'fields_to_return' => $returnObjects ? array('meta_score_value:score') : $this->extractLegacyParameter('fields_to_return', $query),
+            'fields_to_return' => $returnType == KaliopQuery::RETURN_CONTENTS ? array('meta_score_value:score') : $this->extractLegacyParameter('fields_to_return', $query),
             // we either load eZ5 objects or return solr data, no need to tell ez4 to load objects as well
             'as_objects' => false, //$this->extractLegacyParameter('as_objects', $query),
             'query_handler' => $this->extractLegacyParameter('query_handler', $query),
@@ -329,19 +334,19 @@ class SearchService implements SearchServiceInterface
     /**
      * Order of importance:
      * 1. override (function parameter)
-     * 2. query member
+     * 2. query member (if set)
      * 3. default for this service
      * @param Query $query
-     * @param null $forceReturnObjects
-     * @return bool
+     * @param null|string $forceReturnType
+     * @return string
      */
-    protected function shouldReturnObjects(Query $query, $forceReturnObjects = null)
+    protected function getReturnType(Query $query, $forceReturnType = null)
     {
-        if ($forceReturnObjects !== null) {
-            return $forceReturnObjects;
+        if ($forceReturnType !== null) {
+            return $forceReturnType;
         }
 
-        return ($query instanceof KaliopQuery) ? !$query->returnRawData : $this->defaultReturnObjects;
+        return ($query instanceof KaliopQuery && $query->returnType !== null) ? $query->returnType : $this->defaultReturnType;
     }
 
     /**
@@ -408,22 +413,82 @@ class SearchService implements SearchServiceInterface
     }
 
     /**
-     * @param array|null $searchResults
-     * @param bool $returnObjects
+     * @param array $searchResultsContainer
+     * @param string $returnType
      * @return SearchHit[]|array depending on $returnObjects
      */
-    protected function buildResultObjects($searchResults, $returnObjects)
+    protected function buildResultObjects($searchResultsContainer, $returnType)
     {
+        if ($returnType == KaliopQuery::RETURN_CONTENTS || $returnType == KaliopQuery::RETURN_EZFIND_DATA) {
+            $searchResults = $searchResultsContainer['SearchResult'];
+        } else {
+            // we need a little hack to be able to access data in protected members
+            $extras = $searchResultsContainer['SearchExtras'];
+
+            // trick to access data from a protected member of ezfSearchResultInfo
+            // @see http://blag.kazeno.net/development/access-private-protected-properties
+            $propGetter = Closure::bind(function($prop){return $this->$prop;}, $extras, $extras);
+            $resultArray = $propGetter('ResultArray');
+            $searchResults = $resultArray['response']['docs'];
+        }
+
         if (!is_array($searchResults)) {
             return [];
         }
 
-        if ($returnObjects) {
-            foreach ($searchResults as $index => $result) {
-                try {
-                    $searchResults[$index] = new SearchHit(
+        $results = array();
+
+        foreach ($searchResults as $index => $result) {
+            switch($returnType) {
+
+                case KaliopQuery::RETURN_CONTENTS:
+                    try {
+                        $results[$index] = new SearchHit(
+                            [
+                                'valueObject' => $this->contentService->loadContent($result['id']),
+                                'score' => isset($result['score'])? $result['score'] : null,
+                                'highlight' => isset($result['highlight'])? $result['highlight'] : null,
+                                'elevated' => isset($result['elevated'])? $result['elevated'] : null,
+                                /// @todo decide what is the correct value for 'index': guid, installation_id/guid ?
+                                //'index' => isset($result['guid'])? $result['guid'] : null,
+                            ]
+                        );
+                    } catch (NotFoundException $e) {
+                        if ($this->logger) {
+                            // Solr sometimes gets out of sync... make sure users don't see exceptions here
+                            $message = sprintf(
+                                "Can not access content corresponding to solr record with Content Id: %s, Main Location Id: %s\n%s\n%s",
+                                $result['id'],
+                                $result['main_node_id'],
+                                $e->getMessage(),
+                                $e->getTraceAsString()
+                            );
+
+                            $this->logger->warning($message);
+                        }
+                        unset($searchResults[$index]);
+                    } catch (UnauthorizedException $e) {
+                        /// @todo verify when/if this can happen...
+                        if ($this->logger) {
+                            $message = sprintf(
+                                "Can not access content corresponding to solr record with Content Id: %s, Main Location Id: %s\n%s\n%s",
+                                $result['id'],
+                                $result['main_node_id'],
+                                $e->getMessage(),
+                                $e->getTraceAsString()
+                            );
+
+                            $this->logger->warning($message);
+                        }
+                        unset($searchResults[$index]);
+                    }
+                    break;
+
+                case KaliopQuery::RETURN_EZFIND_DATA:
+                case KaliopQuery::RETURN_SOLR_DATA:
+                    $results[$index] = new SearchHit(
                         [
-                            'valueObject' => $this->contentService->loadContent($result['id']),
+                            'valueObject' => $result,
                             'score' => isset($result['score'])? $result['score'] : null,
                             'highlight' => isset($result['highlight'])? $result['highlight'] : null,
                             'elevated' => isset($result['elevated'])? $result['elevated'] : null,
@@ -431,39 +496,11 @@ class SearchService implements SearchServiceInterface
                             //'index' => isset($result['guid'])? $result['guid'] : null,
                         ]
                     );
-                } catch (NotFoundException $e) {
-                    if ($this->logger) {
-                        // Solr sometimes gets out of sync... make sure users don't see exceptions here
-                        $message = sprintf(
-                            "Can not access content corresponding to solr record with Content Id: %s, Main Location Id: %s\n%s\n%s",
-                            $result['id'],
-                            $result['main_node_id'],
-                            $e->getMessage(),
-                            $e->getTraceAsString()
-                        );
-
-                        $this->logger->warning($message);
-                    }
-                    unset($searchResults[$index]);
-                } catch (UnauthorizedException $e) {
-                    /// @todo verify when/if this can happen...
-                    if ($this->logger) {
-                        $message = sprintf(
-                            "Can not access content corresponding to solr record with Content Id: %s, Main Location Id: %s\n%s\n%s",
-                            $result['id'],
-                            $result['main_node_id'],
-                            $e->getMessage(),
-                            $e->getTraceAsString()
-                        );
-
-                        $this->logger->warning($message);
-                    }
-                    unset($searchResults[$index]);
-                }
+                    break;
             }
         }
 
-        return $searchResults;
+        return $results;
     }
 
 //    /**

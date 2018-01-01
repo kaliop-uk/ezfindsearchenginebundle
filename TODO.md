@@ -14,8 +14,7 @@
   - sectionName: can not do
   - sectionIdentifier: can not do
 
-* add new criteria based on data available in ezfind (solr):
-  - other ?
+* add new criteria based on data available in ezfind (solr) ?
 
 * add new sort converters based on data available in ezfind (solr) ?
 

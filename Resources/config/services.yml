@@ -20,6 +20,9 @@ parameters:
     # The legacy 'fetch function' used to handle searches
     ezfind_search_engine.search_settings.legacy_function_handler.module_name: 'ezfind'
     ezfind_search_engine.search_settings.legacy_function_handler.function_name: 'search'
+    # The legacy class used to generate solr query strings
+    # (used when sorting by score and by the logicalNot criterion)
+    ezfind_search_engine.search_settings.legacy_query_builder_class: '\ezfeZPSolrQueryBuilder'
 
     ezfind_search_engine.api.service.search.class: Kaliop\EzFindSearchEngineBundle\Core\Repository\SearchService
     ezfind_search_engine.content.criteria_converter.class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriteriaConverter
@@ -42,6 +45,9 @@ services:
     # Note: tag handler services with 'ezfind_search_engine.content.criterion_handler.filter' to include them in this converter
     ezfind_search_engine.content.criteria_converter.filter:
         class: '%ezfind_search_engine.content.criteria_converter.class%'
+        arguments:
+            - []
+            - '%ezfind_search_engine.search_settings.legacy_query_builder_class%'
 
     # Note: tag handler services with 'ezfind_search_engine.content.sort_clause_handler' to include them in this converter
     ezfind_search_engine.content.sort_clause_converter:

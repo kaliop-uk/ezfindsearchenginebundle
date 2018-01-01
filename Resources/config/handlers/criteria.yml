@@ -77,6 +77,11 @@ services:
         tags:
             - {name: ezfind_search_engine.content.criterion_handler.filter}
 
+    ezfind_search_engine.content.criterion_handler.solr_raw:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\SolrRaw
+        tags:
+            - {name: ezfind_search_engine.content.criterion_handler.filter}
+
     ezfind_search_engine.content.criterion_handler.subtree:
         class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler\Subtree
         tags:

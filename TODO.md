@@ -23,7 +23,6 @@
   - LocationPathString (using main location I presume ?)
 
 * add new criteria based on data available in ezfind (solr):
-  - raw solr filter
   - other ?
 
 * add new sort converters based on data available in ezfind (solr) ?

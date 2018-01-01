@@ -57,8 +57,6 @@ class CriteriaConverter extends Converter
      * @param array $filter
      * @return string
      * @throws NotImplementedException
-     *
-     * @todo allow class ezfeZPSolrQueryBuilder to be specified via settings
      */
     public function generateQueryString($filter)
     {

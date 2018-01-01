@@ -24,7 +24,7 @@ abstract class FieldBase extends CriterionHandler
         return $legacyKernelClosure();
     }
 
-    /// @todo do we really need to use a runCallback call here ?
+    /// @todo (!important) verify: do we really need to use a runCallback call here ?
     protected function determineFieldName($fieldName)
     {
         $fieldName = $this->getLegacyKernel()->runCallback(

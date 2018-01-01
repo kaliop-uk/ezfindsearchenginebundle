@@ -18,8 +18,6 @@ class LocationId extends CriterionHandler
      * @param SelectQuery $query
      * @param Criterion $criterion
      * @return string|string[]
-     *
-     * @todo verify if handling of multiple states via OR is correct
      */
     public function handle( CriteriaConverter $converter, Criterion $criterion )
     {

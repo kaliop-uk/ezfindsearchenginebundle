@@ -1,5 +1,9 @@
 * fix behaviour for when the value for a criterion has a space in it (is it the same for fulltext vs eg. remote_id ?)
 
+* check behaviour of all implemented criteria converters compared to std search service
+  - fulltext: might currently differ
+  - objectstateid: what happens when many states are passed in?
+
 * check list of all missing criteria converters compared to std search service (for Content searches)
   - contenttypegroup: can not do
   - datemetadata: fails with operator IN
@@ -14,11 +18,13 @@
   - sectionName: can not do
   - sectionIdentifier: can not do
 
-* add new criteria based on data available in ezfind (solr) ?
+* add new criteria based on data available in ezfind (solr): what ?
 
-* add new sort converters based on data available in ezfind (solr) ?
+* add new sort converters based on data available in ezfind (solr): what ?
 
 * decide what to do with parameter '$fieldFilters' for findContent and findSingle
+
+* see all TODOs in the SearchService
 
 * add unit tests (with travis and kaliop mig bundle for loading sample content) 
 

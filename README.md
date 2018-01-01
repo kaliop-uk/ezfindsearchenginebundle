@@ -3,6 +3,18 @@
 This bundle introduces a wrapper around the legacy eZFind search engine, making it available to developers with the
 same search API available by default in eZ Publish 5.
 
+
+## Features
+
+* swap existing database-based content searches with solr-based searches by simply changing the name of *one* service used
+* supports most of the query criteria and sort clauses from the eZPublish kernel
+* allows to get back from searches either eZ5 Content objects or raw solr data (in both eZFind-decoded and SOLR-native format)
+* allows to sort by score
+* allows to use custom SOLR syntax for both query criteria and sort clauses
+* unlike the SolrSearchEngineBundle, does *not* overtake all existing content searches
+* optimized for speed of execution and memory usage (as much as we can without nuking eZFind)
+
+
 ## Setup
 
 ### Installation

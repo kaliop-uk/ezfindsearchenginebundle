@@ -7,7 +7,7 @@ use eZ\Publish\API\Repository\Values\Content\Query as BaseQuery;
 class Query extends BaseQuery
 {
     const RETURN_CONTENTS = 'contents';
-    const RETURN_EZFIND_DATA = 'return_ezfind_data';
+    const RETURN_EZFIND_DATA = 'ezfind_data';
     const RETURN_SOLR_DATA = 'solr_data';
 
     /**

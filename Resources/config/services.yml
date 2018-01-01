@@ -8,7 +8,7 @@ parameters:
     # Boost functions used to modify relevance scoring
     ezfind_search_engine.search_settings.boost_functions:
         - 'recip(ms(NOW/HOUR,attr_publication_date_dt),4e-12,1000,2)'
-    # List of fields to return. Used only when returning raw ezfind data instead of Contents
+    # List of fields to return. Used only when returning raw ezfind/solr data instead of Contents
     ezfind_search_engine.search_settings.fields_to_return:
         - meta_name_t
         - meta_owner_name_t

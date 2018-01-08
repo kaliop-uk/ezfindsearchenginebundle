@@ -108,3 +108,8 @@ These are supposed to convert sort clauses
 * I tried using the new search service in a command line script but I always get back no results
   A: there is a bug in the way the eZPublish legacy kernel is booted in command line scripts. We provide as courtesy
      an alternative implementation that can be activated by editing the services
+
+
+## Thanks
+
+Special tahnks to SOkamoto (who got this all started), Crevillo, DClements, MIwaniak, SKlimaszewski

@@ -3,28 +3,31 @@
 namespace Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler;
 
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
-use eZ\Publish\API\Repository\Values\Content\Query\Criterion\Operator;
 use Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriteriaConverter;
 use Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler;
 
 class ContentTypeIdentifier extends CriterionHandler
 {
+    /**
+     * @inheritdoc
+     */
     public function accept(Criterion $criterion)
     {
-        return
-            $criterion instanceof Criterion\ContentTypeIdentifier;
+        return $criterion instanceof Criterion\ContentTypeIdentifier;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function handle(CriteriaConverter $converter, Criterion $criterion)
     {
-        $result = [];
-
         $valueList = (array)$criterion->value;
 
+        $classIdentifiers = [];
         foreach ($valueList as $value) {
-            $result[] = 'class_identifier:' . $this->escapeValue($value);
+            $classIdentifiers[] = $this->escapeValue($value);
         }
 
-        return count($result) == 1 ? $result[0] : array_unshift($result, 'OR');
+        return 'class_identifier:(' . implode(' OR ', $classIdentifiers) . ')';
     }
 }

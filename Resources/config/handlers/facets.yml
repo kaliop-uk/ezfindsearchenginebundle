@@ -1,0 +1,32 @@
+services:
+    ezfind_search_engine.content.facet_handler:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\FacetHandler
+        abstract: true
+        calls:
+            - [ setLegacyKernel, [ '@ezpublish_legacy.kernel' ] ]
+
+    ezfind_search_engine.content.facet_handler.content_type:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\FacetHandler\ContentType
+        parent: ezfind_search_engine.content.facet_handler
+        arguments: ['@ezpublish.api.repository']
+        tags:
+            - { name: ezfind_search_engine.content.facet_handler }
+
+    ezfind_search_engine.content.facet_handler.field:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\FacetHandler\Field
+        parent: ezfind_search_engine.content.facet_handler
+        tags:
+            - { name: ezfind_search_engine.content.facet_handler }
+
+    ezfind_search_engine.content.facet_handler.criterion:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\FacetHandler\Criterion
+        parent: ezfind_search_engine.content.facet_handler
+        arguments: ['@ezfind_search_engine.content.criteria_converter.filter']
+        tags:
+            - { name: ezfind_search_engine.content.facet_handler }
+
+    ezfind_search_engine.content.facet_handler.field_range:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\FacetHandler\FieldRange
+        parent: ezfind_search_engine.content.facet_handler
+        tags:
+            - { name: ezfind_search_engine.content.facet_handler }

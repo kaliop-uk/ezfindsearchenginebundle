@@ -3,6 +3,9 @@
 namespace Kaliop\EzFindSearchEngineBundle\Core\Repository;
 
 use Closure;
+use eZ\Publish\API\Repository\Values\Content\Search\Facet;
+use ezfSearchResultInfo;
+use Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\FacetConverter;
 use Psr\Log\LoggerInterface;
 use eZ\Publish\API\Repository\SearchService as SearchServiceInterface;
 use eZ\Publish\API\Repository\ContentService;
@@ -45,6 +48,9 @@ class SearchService implements SearchServiceInterface
     /** @var CriteriaConverter */
     protected $filterCriteriaConverter;
 
+    /** @var  FacetConverter */
+    protected $facetConverter;
+
     /** @var SortClauseConverter */
     protected $sortClauseConverter;
 
@@ -62,6 +68,7 @@ class SearchService implements SearchServiceInterface
         ContentService $contentService,
         ContentTypeService $contentTypeService,
         CriteriaConverter $filterCriteriaConverter,
+        FacetConverter $facetConverter,
         SortClauseConverter $sortClauseConverter,
         $defaultBoostFunctions,
         $defaultFieldsToReturn,
@@ -80,6 +87,7 @@ class SearchService implements SearchServiceInterface
 
         // Converters
         $this->filterCriteriaConverter = $filterCriteriaConverter;
+        $this->facetConverter = $facetConverter;
         $this->sortClauseConverter = $sortClauseConverter;
 
         // Making sure these are arrays
@@ -128,7 +136,7 @@ class SearchService implements SearchServiceInterface
 
         return new KaliopSearchResult(
             [
-                //'facets' => $result['Facets'],
+                'facets' => $result['Facets'],
                 'searchHits' => $result['SearchHits'],
                 'time' => $time,
                 'maxScore' => $maxScore,
@@ -222,8 +230,7 @@ class SearchService implements SearchServiceInterface
         $this->logSearchErrors($searchResult);
 
         $searchResult['SearchHits'] = $this->buildResultObjects($searchResult, $returnType);
-
-        //$searchResult['Facets'] = $this->buildResultFacets($searchResult['SearchExtras']);
+        $searchResult['Facets'] = $this->buildResultFacets($searchResult['SearchExtras'], $query->facetBuilders);
 
         return $searchResult;
     }
@@ -281,13 +288,15 @@ class SearchService implements SearchServiceInterface
         $criterionFilter = array();
         if ($query->criterion) {
             $criterionFilter = $this->extractFilter($query->criterion);
-            //$searchParameters['facet'] = array_merge($this->generateBaseFacets(), $this->extractFacetFilter($query->criterion));
         }
 
         $filterFilter = array();
         if ($query->filter) {
             $filterFilter = $this->extractFilter($query->filter);
-            //$searchParameters['facet'] = array_merge($this->generateBaseFacets(), $this->extractFacetFilter($query->filter));
+        }
+
+        if ($query->facetBuilders) {
+            $searchParameters['facet'] = $this->extractFacet($query->facetBuilders);
         }
 
         if ($scoreSort) {
@@ -367,6 +376,25 @@ class SearchService implements SearchServiceInterface
         }
 
         return $result;
+    }
+
+    /**
+     * Extract FacetBuilders into legacy eZFind facet array.
+     *
+     * @param Query\FacetBuilder[] $facetBuilders
+     * @return array
+     *
+     * @throws NotImplementedException
+     */
+    protected function extractFacet($facetBuilders)
+    {
+        $facets = [];
+
+        foreach ($facetBuilders as $facetBuilder) {
+            $facets[] = $this->facetConverter->handle($facetBuilder);
+        }
+
+        return $facets;
     }
 
     protected function extractSort($sortClauses)
@@ -503,187 +531,28 @@ class SearchService implements SearchServiceInterface
         return $results;
     }
 
-//    /**
-//     * @param array $facetBuilder
-//     */
-//    public function setFacetBuilder($facetBuilder)
-//    {
-//        $this->facetBuilder = $facetBuilder;
-//    }
-//    protected function generateBaseFacets()
-//    {
-//        $result = [];
-//
-//        // Add in the base facets
-//        foreach ($this->facetBuilder as $builder) {
-//            $facetVisitorResult = $this->facetBuilderVisitor->visit($builder);
-//            if (!empty($facetVisitorResult)) {
-//                $result = array_merge($result, $facetVisitorResult);
-//            }
-//        }
-//
-//        return $result;
-//    }
-//
-//    protected function extractFacetFilter(&$criterion)
-//    {
-//        // Still need to check the logical operators
-//        if ($this->criteriaConverter->canHandle($criterion, 'logicalHandlers')) {
-//            return $this->extractSubtreeArray($criterion->criteria);
-//        }
-//
-//        $result = [];
-//
-//        // Process any criterion
-////        foreach( $criterion as $index => $filter ) {
-////            if( $this->criterionVisitor->canVisit( $filter ) ) {
-////                $result[] = [ 'query' => $this->criterionVisitor->visit( $filter ) ];
-////                unset( $criterion[$index] );
-////            }
-////        }
-//
-//        return $result;
-//    }
-//
-//    protected function buildResultFacets(\ezfSearchResultInfo $searchExtras)
-//    {
-//        $facets = [];
-//
-//        if (!isset($this->taxonomyService)) {
-//            return $facets;
-//        }
-//
-//        if ($searchExtras->hasAttribute('facet_fields')) {
-//            $facetFields = $searchExtras->attribute('facet_fields');
-//            if (!is_array($facetFields)) {
-//                return $facets;
-//            }
-//
-//            foreach ($facetFields as $facet) {
-//                $fieldName = reset($facet['fieldList']);
-//                if (empty($fieldName)) {
-//                    continue;
-//                }
-//                $facetField = $this->facetBuilderVisitor->map($fieldName, $facet);
-//
-//                try {
-//                    $taxonomy = $this->taxonomyService->loadTaxonomy($facetField->name);
-//                    if (empty($taxonomy)) {
-//                        // @todo Something has gone wrong...the facet returned doesn't exist as a taxonomy?
-//                        continue;
-//                    }
-//
-//                    $result = $this->buildFacetResult($facetField->entries['countList'],
-//                        $taxonomy,
-//                        $taxonomy->getRoots());
-//
-//                    if (!empty($result)) {
-//                        $facetKey = $facetField->name;
-//                        if (!empty($this->solrFieldFacetMapping[$fieldName])) {
-//                            $facetKey = $this->solrFieldFacetMapping[$fieldName];
-//                        }
-//
-//                        $facets[$facetKey] = [
-//                            'label' => $facetField->entries['label'],
-//                            'facetList' => $result,
-//                        ];
-//                    }
-//                } catch (\Exception $e) {
-//                    // @todo Taxonomy wasn't found...log it
-//                }
-//            }
-//        }
-//
-//        return $facets;
-//    }
-//
-//    protected function buildFacetResult(
-//        array $countList,
-//        ContentTree $taxonomy,
-//        array $locationIdList
-//    ) {
-//        $result = [];
-//        foreach ($locationIdList as $locationId) {
-//            $node = $taxonomy->getNodeByLocationId($locationId);
-//            if (isset($countList[$node->getId()])) {
-//                $count = $countList[$node->getId()];
-//            } else {
-//                $count = 0;
-//            }
-//
-//            $result[$locationId] = [
-//                'content' => $node->getContent(),
-//                'isFlat' => $taxonomy->isFlat(),
-//                'count' => $count,
-//                'children' => [],
-//            ];
-//
-//            $childrenLocationIdList = $node->getChildren();
-//            if (!empty($childrenLocationIdList)) {
-//                $result[$locationId]['children'] = $this->buildFacetResult($countList,
-//                    $taxonomy,
-//                    $childrenLocationIdList);
-//            }
-//
-//            // Remove empty facets
-//            if ($result[$locationId]['count'] == 0 && empty($result[$locationId]['children'])) {
-//                unset($result[$locationId]);
-//            }
-//        }
-//
-//        return $result;
-//    }
-//
-//    public function extractAppliedFilters($searchCriterion)
-//    {
-//        if ($searchCriterion instanceof Query) {
-//            return $this->extractAppliedFilters($searchCriterion->criterion);
-//        } elseif ($searchCriterion instanceof Query\Criterion\LogicalOperator) {
-//            return $this->extractAppliedFilters($searchCriterion->criteria);
-//        }
-//        $result = [];
-//
-//        if (!is_array($searchCriterion)) {
-//            $searchCriterion = [$searchCriterion];
-//        }
-//
-//        foreach ($searchCriterion as $criterion) {
-//            if (!$criterion instanceof Criterion\Field) {
-//                continue;
-//            }
-//
-//            list($contentClass, $contentAttribute) = array_pad(explode('/', $criterion->target, 2), -2, null);
-//
-//            $taxonomy = $this->taxonomyService->loadTaxonomy($contentAttribute);
-//            if (empty($taxonomy)) {
-//                // @todo Something went wrong...we should do something
-//                continue;
-//            }
-//
-//            foreach ($criterion->value as $taxonomyId) {
-//                $term = $taxonomy->getNodeByObjectId($taxonomyId);
-//                if (empty($term)) {
-//                    continue;
-//                }
-//
-//                $parentTerm = $taxonomy->getNodeByLocationId($term->getParentLocationId());
-//                if (empty($parentTerm)) {
-//                    // @todo - Parent wasn't found...what should we do?
-//                    continue;
-//                }
-//
-//                if (empty($result[$criterion->target][$parentTerm->getId()])) {
-//                    $result[$criterion->target][$parentTerm->getId()] = [
-//                        'term' => $parentTerm,
-//                        'children' => [],
-//                    ];
-//                }
-//
-//                $result[$criterion->target][$parentTerm->getId()]['children'][$term->getId()] = $term;
-//            }
-//        }
-//
-//        return $result;
-//    }
+    /**
+     * Create result facets based on SOLR returned results.
+     *
+     * @param ezfSearchResultInfo $searchResultInfo
+     * @param Query\FacetBuilder[] $facetBuilders
+     *
+     * @return Facet[]
+     */
+    protected function buildResultFacets(ezfSearchResultInfo $searchResultInfo, $facetBuilders)
+    {
+        $facets = [];
 
+        foreach ($facetBuilders as $facetBuilder) {
+            $facets[] = $this->facetConverter->buildFacet(
+                $facetBuilder,
+                $searchResultInfo->attribute('facet_fields'),
+                $searchResultInfo->attribute('facet_queries'),
+                $searchResultInfo->attribute('facet_dates'),
+                $searchResultInfo->attribute('facet_ranges')
+            );
+        }
+
+        return $facets;
+    }
 }

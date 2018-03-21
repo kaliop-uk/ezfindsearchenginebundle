@@ -41,29 +41,9 @@ class TestCommand extends ContainerAwareCommand
 
 
         $query = new KQuery();
-        $query->query = new Criterion\LogicalOr([
-            new Criterion\LogicalAnd([
-                new Criterion\ContentTypeIdentifier('fs_article'),
-                new Criterion\Subtree('/1/2/'),
-                new Criterion\ParentLocationId(128),
-                new Criterion\FullText('spuerscript'),
-                new Criterion\Field('fs_article/strapline', Criterion\Operator::CONTAINS, 'ome'),
-                new Criterion\Field('fs_article/strapline', Criterion\Operator::LIKE, 's_m%'),
-                new Criterion\Field('fs_article/integer', Criterion\Operator::GT, 12),
-                new Criterion\Field('fs_article/integer', Criterion\Operator::IN, array(23, 32)),
-            ]),
-            new Criterion\ContentTypeIdentifier('folder'),
-            new Criterion\LogicalAnd([
-                new Criterion\SectionId(1),
-                new Criterion\ContentId(5),
-                new Criterion\LocationId(5),
-                new Criterion\LocationPriority(Criterion\Operator::GT, 0),
-                new Criterion\RemoteId('abcdefg:ka and bb:cc'),
-                new Criterion\DateMetadata(Criterion\DateMetadata::CREATED, Criterion\Operator::GT, 500000000),
-                new KCriterion\SolrRaw('NOT(meta_path_string_ms:bbbb^4 OR meta_path_string_ms:bbba^4 AND (meta_path_string_ms:hello OR meta_path_string_ms:world))'),
-                new Criterion\LogicalNot(new Criterion\RemoteId('abcdefg')),
-                new Criterion\UserMetadata(Criterion\UserMetadata::OWNER, Criterion\Operator::EQ, 14),
-            ])
+        $query->query = new Criterion\LogicalAnd([
+            new Criterion\ContentTypeIdentifier('ls_article'),
+            new Criterion\Subtree('/1/2/'),
         ]);
 
         $query->limit = 10;

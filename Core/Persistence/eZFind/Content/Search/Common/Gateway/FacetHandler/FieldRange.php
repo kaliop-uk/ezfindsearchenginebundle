@@ -51,13 +51,14 @@ class FieldRange extends FacetHandler
 
         $facetKey = $this->getFacetKey($facetBuilder);
         if (isset($ranges[$facetKey])) {
-            foreach ($ranges[$facetKey]['counts'] as $date => $count) {
+            foreach ($ranges[$facetKey]['counts'] as $value => $count) {
                 $facetEntry = new RangeFacetEntry();
-                $facetEntry->from = new \DateTime($date);
-                $facetEntry->to = new \DateTime($date);
+                $facetEntry->from = $value;
+                $facetEntry->to = $value;
                 $facetEntry->totalCount = $count;
 
                 $entries[] = $facetEntry;
+                $totalCount += $count;
             }
         }
 

@@ -25,6 +25,12 @@ services:
         tags:
             - { name: ezfind_search_engine.content.facet_handler }
 
+    ezfind_search_engine.content.facet_handler.date_range:
+        class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\FacetHandler\DateRange
+        parent: ezfind_search_engine.content.facet_handler
+        tags:
+            - { name: ezfind_search_engine.content.facet_handler }
+
     ezfind_search_engine.content.facet_handler.field_range:
         class: Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\FacetHandler\FieldRange
         parent: ezfind_search_engine.content.facet_handler

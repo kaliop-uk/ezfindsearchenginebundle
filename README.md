@@ -59,6 +59,56 @@ query parameters, f.e. to speed up the execution of the query by disabling unnee
     ...
 ```
 
+### Facets
+
+Currently the following FacetBuilders are implemented by the bundle:
+
+```php
+use eZ\Publish\API\Repository\Values\Content\Query\FacetBuilder;
+use Kaliop\EzFindSearchEngineBundle\API\Repository\Values\Content\Query\FacetBuilder as KaliopFacetBuilder;
+ 
+$now = new DateTime();
+$yearAgo = new DateTime();
+$yearAgo->modify('-1 year');
+ 
+$query->facetBuilders = [
+    // Kaliop Facet Builders
+    new KaliopFacetBuilder\FieldRangeFacetBuilder([
+        'name' => 'Numeric field range facet',
+        'fieldPath' => 'product/price',
+        'start' => 100,
+        'end' => 500,
+        'gap' => 50,
+        'limit' => 8,
+    ]),
+    new KaliopFacetBuilder\DateRangeFacetBuilder([
+        'name' => 'Date range facet',
+        'fieldPath' => 'article/publication_date',
+        'start' => $yearAgo,
+        'end' => $now,
+        'gap' => new DateInterval('P1M'),
+        'limit' => 12,
+    ]),
+    // Base eZ Facet Builders
+    new FacetBuilder\FieldFacetBuilder([
+        'name' => 'Simple field facet',
+        'fieldPaths' => 'article/title',
+        'limit' => 20,
+    ]),
+    new FacetBuilder\FieldFacetBuilder([
+        'name' => 'Object relation(s) facet',
+        'fieldPaths' => 'article/author/id',
+        'limit' => 20,
+    ]),
+    new FacetBuilder\ContentTypeFacetBuilder([
+        'name' => 'Content type facet',
+    ]),
+    new FacetBuilder\CriterionFacetBuilder([
+        'name' => 'Criterion facet',
+        'filter' => new Criterion\Field('article/title', Criterion\Operator::CONTAINS, 'new'),
+    ]),
+];
+```
 
 ## Extending the bundle
 

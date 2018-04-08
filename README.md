@@ -23,9 +23,11 @@ You can install the bundle using Composer:
 
     composer require kaliop/ezfindsearchenginebundle
  
+and then enabling it in your kernel.
+
 ### Configuration
 
-The bundle comes fully configured by default. Here is an example of the complete list of parameters available:
+The bundle comes fully configured by default. Here the complete list of parameters available with example values:
 
 ```yaml
     ezfind_search_engine.search_settings.boost_functions:
@@ -37,7 +39,7 @@ The bundle comes fully configured by default. Here is an example of the complete
         - meta_path_string_ms
         - meta_priority_si
         - meta_score_value:score # Score field needs to be renamed as it won't be passed from eZFind
-    # in case you want to use an alternative 'legacy fetch function'. The default is ezfind/search
+    # in case you want to use an alternative 'legacy fetch function' to power the search service. The default is ezfind/search
     ezfind_search_engine.search_settings.legacy_function_handler.module_name: 'ezfind'
     ezfind_search_engine.search_settings.legacy_function_handler.function_name: 'search'
 ```
@@ -112,4 +114,4 @@ These are supposed to convert sort clauses
 
 ## Thanks
 
-Special tahnks to SOkamoto (who got this all started), Crevillo, DClements, MIwaniak, SKlimaszewski
+Special tahnks to SOkamoto (who got this all started), CRevillo, DClements, MIwaniak, SKlimaszewski

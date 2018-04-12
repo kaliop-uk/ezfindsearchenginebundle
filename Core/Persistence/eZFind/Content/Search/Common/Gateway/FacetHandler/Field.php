@@ -37,12 +37,19 @@ class Field extends FacetHandler
     public function createFacetResult(FacetBuilder $facetBuilder, $fields = [], $queries = [], $dates = [], $ranges = [])
     {
         $facetKey = $this->getFacetKey($facetBuilder);
+        $fieldNames = [];
+        foreach ((array) $facetBuilder->fieldPaths as $fieldPath) {
+            $fieldNames[] = \eZSolr::getFieldName($fieldPath, false, 'facet');
+        }
 
         $entries = [];
         $total = 0;
 
         foreach ($fields as $field) {
-            if (isset($field['facet_key']) && $field['facet_key'] == $facetKey) {
+            if (
+                (isset($field['facet_key']) && $field['facet_key'] == $facetKey) ||
+                (!isset($field['facet_key']) && in_array($field['field'], $fieldNames))
+            ) {
                 foreach ($field['countList'] as $word => $count) {
                     $entries[$word] = $count;
                 }
@@ -51,7 +58,9 @@ class Field extends FacetHandler
                     $total += intval($count);
                 }
 
-                break;
+                if (isset($field['facet_key'])) {
+                    break;
+                }
             }
         }
 

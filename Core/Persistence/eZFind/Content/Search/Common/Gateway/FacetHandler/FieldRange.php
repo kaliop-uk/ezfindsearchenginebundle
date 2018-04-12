@@ -46,12 +46,16 @@ class FieldRange extends FacetHandler
      */
     public function createFacetResult(FacetBuilder $facetBuilder, $fields = [], $queries = [], $dates = [], $ranges = [])
     {
+        $facetKey = $this->getFacetKey($facetBuilder);
+        $fieldName = \eZSolr::getFieldName($facetBuilder->fieldPath, false, 'facet');
+
         $entries = [];
         $totalCount = 0;
-
-        $facetKey = $this->getFacetKey($facetBuilder);
-        foreach ($ranges as $range) {
-            if (isset($range['facet_key']) && $range['facet_key'] == $facetKey) {
+        foreach ($ranges as $field => $range) {
+            if (
+                (isset($range['facet_key']) && $range['facet_key'] == $facetKey) ||
+                (!isset($range['facet_key']) && $field == $fieldName)
+            ) {
                 foreach ($range['counts'] as $value => $count) {
                     $facetEntry = new RangeFacetEntry();
                     $facetEntry->from = $value;

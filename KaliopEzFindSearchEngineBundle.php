@@ -13,6 +13,7 @@ class KaliopEzFindSearchEngineBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new CompilerPass\ContentCriteriaConverterPass());
+        $container->addCompilerPass(new CompilerPass\ContentFacetConverterPass());
         $container->addCompilerPass(new CompilerPass\ContentSortClauseConverterPass());
     }
 }

@@ -16,14 +16,13 @@ class ContentTypeId extends CriterionHandler
 
     public function handle(CriteriaConverter $converter, Criterion $criterion)
     {
-        $result = [];
-
         $valueList = (array)$criterion->value;
 
+        $classes = [];
         foreach ($valueList as $value) {
-            $result[] = 'contentclass_id:' . $this->escapeValue($value);
+            $classes[] = $this->escapeValue($value);
         }
 
-        return count($result) == 1 ? $result[0] : array_unshift($result, 'OR');
+        return 'contentclass_id:(' . implode(' OR ', $classes) . ')';
     }
 }

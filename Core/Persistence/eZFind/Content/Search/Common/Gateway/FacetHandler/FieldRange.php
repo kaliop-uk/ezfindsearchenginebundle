@@ -50,15 +50,19 @@ class FieldRange extends FacetHandler
         $totalCount = 0;
 
         $facetKey = $this->getFacetKey($facetBuilder);
-        if (isset($ranges[$facetKey])) {
-            foreach ($ranges[$facetKey]['counts'] as $value => $count) {
-                $facetEntry = new RangeFacetEntry();
-                $facetEntry->from = $value;
-                $facetEntry->to = $value;
-                $facetEntry->totalCount = $count;
+        foreach ($ranges as $range) {
+            if (isset($range['facet_key']) && $range['facet_key'] == $facetKey) {
+                foreach ($range['counts'] as $value => $count) {
+                    $facetEntry = new RangeFacetEntry();
+                    $facetEntry->from = $value;
+                    $facetEntry->to = $value;
+                    $facetEntry->totalCount = $count;
 
-                $entries[] = $facetEntry;
-                $totalCount += $count;
+                    $entries[] = $facetEntry;
+                    $totalCount += $count;
+                }
+
+                break;
             }
         }
 

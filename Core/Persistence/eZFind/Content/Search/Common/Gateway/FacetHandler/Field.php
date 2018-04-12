@@ -41,13 +41,17 @@ class Field extends FacetHandler
         $entries = [];
         $total = 0;
 
-        if (isset($fields[$facetKey])) {
-            foreach ($fields[$facetKey]['countList'] as $word => $count) {
-                $entries[$word] = $count;
-            }
+        foreach ($fields as $field) {
+            if (isset($field['facet_key']) && $field['facet_key'] == $facetKey) {
+                foreach ($field['countList'] as $word => $count) {
+                    $entries[$word] = $count;
+                }
 
-            foreach ($entries as $word => $count) {
-                $total += intval($count);
+                foreach ($entries as $word => $count) {
+                    $total += intval($count);
+                }
+
+                break;
             }
         }
 

@@ -53,14 +53,18 @@ class DateRange extends FacetHandler
         $entries = [];
 
         $facetKey = $this->getFacetKey($facetBuilder);
-        if (isset($ranges[$facetKey])) {
-            foreach ($ranges[$facetKey]['counts'] as $date => $count) {
-                $facetEntry = new RangeFacetEntry();
-                $facetEntry->from = new \DateTime($date);
-                $facetEntry->to = new \DateTime($date);
-                $facetEntry->totalCount = $count;
+        foreach ($ranges as $range) {
+            if (isset($range['facet_key']) && $range['facet_key'] == $facetKey) {
+                foreach ($range['counts'] as $date => $count) {
+                    $facetEntry = new RangeFacetEntry();
+                    $facetEntry->from = new \DateTime($date);
+                    $facetEntry->to = new \DateTime($date);
+                    $facetEntry->totalCount = $count;
 
-                $entries[] = $facetEntry;
+                    $entries[] = $facetEntry;
+                }
+
+                break;
             }
         }
 

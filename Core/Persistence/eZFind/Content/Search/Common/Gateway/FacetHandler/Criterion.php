@@ -55,8 +55,12 @@ class Criterion extends FacetHandler
         $facetKey = $this->getFacetKey($facetBuilder);
 
         $count = 0;
-        if (isset($queries[$facetKey])) {
-            $count = $queries[$facetKey]['count'];
+        foreach ($queries as $query) {
+            if (isset($query['facet_key']) && $query['facet_key'] == $facetKey) {
+                $count = $query['count'];
+
+                break;
+            }
         }
 
         return new CriterionFacet([

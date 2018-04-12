@@ -51,10 +51,14 @@ class ContentType extends FacetHandler
         $facetKey = $this->getFacetKey($facetBuilder);
 
         $entries = [];
-        if (isset($fields[$facetKey])) {
-            foreach ($fields[$facetKey]['countList'] as $contentTypeId => $count) {
-                $contentType = $this->repository->getContentTypeService()->loadContentType($contentTypeId);
-                $entries[$contentType->identifier] = $count;
+        foreach ($fields as $field) {
+            if (isset($field['facet_key']) && $field['facet_key'] == $facetKey) {
+                foreach ($field['countList'] as $contentTypeId => $count) {
+                    $contentType = $this->repository->getContentTypeService()->loadContentType($contentTypeId);
+                    $entries[$contentType->identifier] = $count;
+                }
+                
+                break;
             }
         }
 

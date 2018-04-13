@@ -50,11 +50,15 @@ class DateRange extends FacetHandler
      */
     public function createFacetResult(FacetBuilder $facetBuilder, $fields = [], $queries = [], $dates = [], $ranges = [])
     {
-        $entries = [];
-
         $facetKey = $this->getFacetKey($facetBuilder);
-        foreach ($ranges as $range) {
-            if (isset($range['facet_key']) && $range['facet_key'] == $facetKey) {
+        $fieldName = \eZSolr::getFieldName($facetBuilder->fieldPath, false, 'facet');
+
+        $entries = [];
+        foreach ($ranges as $field => $range) {
+            if (
+                (isset($range['facet_key']) && $range['facet_key'] == $facetKey) ||
+                (!isset($range['facet_key']) && $field == $fieldName)
+            ) {
                 foreach ($range['counts'] as $date => $count) {
                     $facetEntry = new RangeFacetEntry();
                     $facetEntry->from = new \DateTime($date);

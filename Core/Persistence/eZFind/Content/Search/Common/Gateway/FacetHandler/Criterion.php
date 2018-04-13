@@ -53,10 +53,14 @@ class Criterion extends FacetHandler
     public function createFacetResult(FacetBuilder $facetBuilder, $fields = [], $queries = [], $dates = [], $ranges = [])
     {
         $facetKey = $this->getFacetKey($facetBuilder);
+        $facetQuery = $this->criteriaConverter->handle($facetBuilder->filter);
 
         $count = 0;
         foreach ($queries as $query) {
-            if (isset($query['facet_key']) && $query['facet_key'] == $facetKey) {
+            if (
+                (isset($query['facet_key']) && $query['facet_key'] == $facetKey) ||
+                (!isset($query['facet_key']) && $query['queryLimit'] == $facetQuery)
+            ) {
                 $count = $query['count'];
 
                 break;

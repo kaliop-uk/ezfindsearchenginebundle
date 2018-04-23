@@ -24,6 +24,11 @@ class FullText extends CriterionHandler
      */
     public function handle(CriteriaConverter $converter, Criterion $criterion)
     {
+        // Search for all
+        if (trim($criterion->value) == '*') {
+            return 'ezf_df_text:*';
+        }
+
         $value = $this->escapeValue(trim($criterion->value));
 
         // Check if wildcard query

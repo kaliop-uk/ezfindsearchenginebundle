@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler;
 
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
@@ -9,23 +8,27 @@ use Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Commo
 
 class ParentLocationId extends CriterionHandler
 {
+    /**
+     * @inheritdoc
+     */
     public function accept(Criterion $criterion)
     {
         return $criterion instanceof Criterion\ParentLocationId;
 
     }
 
+    /**
+     * @inheritdoc
+     */
     public function handle(CriteriaConverter $converter, Criterion $criterion)
     {
-        $result = [];
-
+        $locationIds = [];
         $valueList = (array)$criterion->value;
 
         foreach ($valueList as $value) {
-            $result[] = 'meta_path_string_ms:/\\/([0-9]+\\/)+' . $this->escapeValue($value) . '\\/[0-9]+\\//';
+            $locationIds[] = $this->escapeValue($value);
         }
 
-        return count($result) == 1 ? $result[0] : array_unshift($result, 'OR');
+        return 'meta_main_parent_node_id_si:(' . implode(' OR ', $locationIds) . ')';
     }
-
 }

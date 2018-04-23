@@ -24,16 +24,20 @@ class FullText extends CriterionHandler
      */
     public function handle(CriteriaConverter $converter, Criterion $criterion)
     {
-        // Fulltext only accepts 1 value
         $value = $this->escapeValue(trim($criterion->value));
 
-        // Escape spaces
-        $value = str_replace(' ', '\\ ', $value);
-
+        // Check if wildcard query
         if ($value && $value != '*' && trim($value, '*') != $value) {
-            // Wildcard query
+            // Escape spaces
+            $value = str_replace(' ', '\\ ', $value);
+
+            // Un-escape wildcard
+            $wildcard = str_replace('\\*', '*', $value);
+
+            // Non-wildcard value
             $value = trim($value, '\*');
-            $value = $value . '^2 OR ' . $value . '*';
+
+            $value = $value . '^2 OR ' . $wildcard;
         }
 
         return 'ezf_df_text:(' . $value . ')';

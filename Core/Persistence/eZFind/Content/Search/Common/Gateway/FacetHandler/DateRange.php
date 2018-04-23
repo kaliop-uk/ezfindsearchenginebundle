@@ -8,6 +8,7 @@ use eZ\Publish\API\Repository\Values\Content\Search\Facet\RangeFacetEntry;
 use Kaliop\EzFindSearchEngineBundle\API\Repository\Values\Content\Query\FacetBuilder\DateRangeFacetBuilder;
 use Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\FacetHandler;
 use DateInterval;
+use DateTime;
 
 class DateRange extends FacetHandler
 {
@@ -55,14 +56,15 @@ class DateRange extends FacetHandler
 
         $entries = [];
         foreach ($ranges as $field => $range) {
-            if (
-                (isset($range['facet_key']) && $range['facet_key'] == $facetKey) ||
-                (!isset($range['facet_key']) && $field == $fieldName)
-            ) {
+            if (in_array($field, [$facetKey, $fieldName])) {
                 foreach ($range['counts'] as $date => $count) {
+                    $from = new DateTime($date);
+                    $to = clone $from;
+                    $to->add($facetBuilder->gap);
+
                     $facetEntry = new RangeFacetEntry();
-                    $facetEntry->from = new \DateTime($date);
-                    $facetEntry->to = new \DateTime($date);
+                    $facetEntry->from = $from;
+                    $facetEntry->to = $to;
                     $facetEntry->totalCount = $count;
 
                     $entries[] = $facetEntry;

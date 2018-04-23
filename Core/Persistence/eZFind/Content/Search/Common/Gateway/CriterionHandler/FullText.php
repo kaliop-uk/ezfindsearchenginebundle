@@ -8,19 +8,34 @@ use Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Commo
 
 class FullText extends CriterionHandler
 {
+    /**
+     * @inheritdoc
+     */
     public function accept(Criterion $criterion)
     {
         return $criterion instanceof Criterion\FullText;
     }
 
     /**
-     * @todo check if we do respect the matching logic as described in class Criterion\Field:
-     *       - do NOT escape wildcards
-     *       - default to AND instead of OR for separate words
+     * If the FullText search contain wildcard search, build correct wildcard query
+     * with non-truncated words boosted.
+     *
+     * @inheritdoc
      */
     public function handle(CriteriaConverter $converter, Criterion $criterion)
     {
         // Fulltext only accepts 1 value
-        return 'ezf_df_text:'.$this->escapeValue($criterion->value);
+        $value = $this->escapeValue(trim($criterion->value));
+
+        // Escape spaces
+        $value = str_replace(' ', '\\ ', $value);
+
+        if ($value && $value != '*' && trim($value, '*') != $value) {
+            // Wildcard query
+            $value = trim($value, '\*');
+            $value = $value . '^2 OR ' . $value . '*';
+        }
+
+        return 'ezf_df_text:(' . $value . ')';
     }
 }

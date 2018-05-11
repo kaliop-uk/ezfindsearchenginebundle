@@ -10,6 +10,7 @@ same search API available by default in eZ Publish 5.
 * supports most of the query criteria and sort clauses from the eZPublish kernel
 * allows to get back from searches either eZ5 Content objects or raw solr data (in both eZFind-decoded and SOLR-native format)
 * allows to sort by score
+* supports facetting
 * allows to use custom SOLR syntax for both query criteria and sort clauses
 * unlike the SolrSearchEngineBundle, does *not* overtake all existing content searches
 * optimized for speed of execution and memory usage (as much as we can without nuking eZFind)

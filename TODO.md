@@ -28,8 +28,6 @@
 
 * add unit tests (with travis and kaliop mig bundle for loading sample content) 
 
-* introduce support for facets
-
 * add legacy search extension that extends ezfind and adds extra features:
     + more parameters for a fetch function similar to ezfind/search
         - eg: avoid highlighting when not needed, see ezfeZPSolrQueryBuilder

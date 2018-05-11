@@ -2,15 +2,15 @@
 
 namespace Kaliop\EzFindSearchEngineBundle\Command;
 
-use eZ\Publish\API\Repository\Values\Content\Content;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use eZ\Publish\API\Repository\Values\Content\Content;
+use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
+use eZ\Publish\API\Repository\Values\Content\Query\SortClause;
 use Kaliop\EzFindSearchEngineBundle\API\Repository\Values\Content\Query as KQuery;
 use Kaliop\EzFindSearchEngineBundle\API\Repository\Values\Content\Query\SortClause as KSortClause;
 use Kaliop\EzFindSearchEngineBundle\API\Repository\Values\Content\Query\Criterion as KCriterion;
-use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
-use eZ\Publish\API\Repository\Values\Content\Query\SortClause;
 
 class TestCommand extends ContainerAwareCommand
 {

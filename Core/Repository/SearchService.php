@@ -6,6 +6,7 @@ use Closure;
 use eZ\Publish\API\Repository\Values\Content\Search\Facet;
 use ezfSearchResultInfo;
 use Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\FacetConverter;
+use Kaliop\EzFindSearchEngineBundle\DataCollector\Logger\QueryLogger;
 use Psr\Log\LoggerInterface;
 use eZ\Publish\API\Repository\SearchService as SearchServiceInterface;
 use eZ\Publish\API\Repository\ContentService;
@@ -63,6 +64,9 @@ class SearchService implements SearchServiceInterface
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var QueryLogger */
+    protected $queryLogger;
+
     public function __construct(
         Closure $legacyKernelClosure,
         ContentService $contentService,
@@ -75,7 +79,8 @@ class SearchService implements SearchServiceInterface
         $defaultReturnType = KaliopQuery::RETURN_CONTENTS,
         $ezFindModule = 'ezfind',
         $ezFindFunction = 'search',
-        LoggerInterface $logger = null
+        LoggerInterface $logger = null,
+        QueryLogger $queryLogger
     ) {
         $this->legacyKernelClosure = $legacyKernelClosure;
         $this->contentService = $contentService;
@@ -84,6 +89,7 @@ class SearchService implements SearchServiceInterface
         $this->ezFindModule = $ezFindModule;
         $this->ezFindFunction = $ezFindFunction;
         $this->logger = $logger;
+        $this->queryLogger = $queryLogger;
 
         // Converters
         $this->filterCriteriaConverter = $filterCriteriaConverter;
@@ -227,6 +233,7 @@ class SearchService implements SearchServiceInterface
             false
         );
 
+        $this->queryLogger->addResultsInfo($searchResult['SearchExtras']);
         $this->logSearchErrors($searchResult);
 
         $searchResult['SearchHits'] = $this->buildResultObjects($searchResult, $returnType);

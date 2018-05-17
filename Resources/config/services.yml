@@ -32,6 +32,9 @@ parameters:
 
     ezpublish_legacy.kernel.lazy_loader.class: Kaliop\EzFindSearchEngineBundle\Core\MVC\Legacy\Kernel\Loader
 
+    ezfind_search_engine.logger.class: Kaliop\EzFindSearchEngineBundle\DataCollector\Logger\QueryLogger
+    ezfind_search_engine.query_collector.class: Kaliop\EzFindSearchEngineBundle\DataCollector\QueryCollector
+
 services:
 
     # In order to make sure that the CLI legacy kernel is always booted, we take over the legacy kernel loader,
@@ -74,9 +77,21 @@ services:
             - '%ezfind_search_engine.search_settings.legacy_function_handler.module_name%'
             - '%ezfind_search_engine.search_settings.legacy_function_handler.function_name%'
             - '@logger'
+            - '@ezfind_search_engine.logger'
         # If you want to have a dedicated log file for this service...
         #tags:
         #    - { name: monolog.logger, channel: ezfind_search_engine }
+
+    ezfind_search_engine.logger:
+        class: '%ezfind_search_engine.logger.class%'
+        public: false
+
+    ezfind_search_engine.query_collector:
+        class: '%ezfind_search_engine.query_collector.class%'
+        public: false
+        arguments: ['@ezfind_search_engine.logger']
+        tags:
+            - { name: data_collector, template: 'KaliopEzFindSearchEngineBundle:Profiler:query_collector.html.twig', id: 'ezfind_search_engine.query_collector' }
 
 #############
 # OLD STUFF #

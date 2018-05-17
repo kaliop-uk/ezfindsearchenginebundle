@@ -9,15 +9,7 @@ class QueryLogger
     /**
      * @var ezfSearchResultInfo[]
      */
-    protected $resultsInfo;
-
-    /**
-     * QueryLogger constructor.
-     */
-    public function __construct()
-    {
-        $this->resultsInfo = [];
-    }
+    protected $resultsInfo = [];
 
     /**
      * Add new eZSearchResultInfo into query logger to gather extra data.

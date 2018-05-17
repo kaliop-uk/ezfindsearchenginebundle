@@ -80,7 +80,7 @@ class SearchService implements SearchServiceInterface
         $ezFindModule = 'ezfind',
         $ezFindFunction = 'search',
         LoggerInterface $logger = null,
-        QueryLogger $queryLogger
+        QueryLogger $queryLogger = null
     ) {
         $this->legacyKernelClosure = $legacyKernelClosure;
         $this->contentService = $contentService;
@@ -233,7 +233,9 @@ class SearchService implements SearchServiceInterface
             false
         );
 
-        $this->queryLogger->addResultsInfo($searchResult['SearchExtras']);
+        if ($this->queryLogger) {
+            $this->queryLogger->addResultsInfo($searchResult['SearchExtras']);
+        }
         $this->logSearchErrors($searchResult);
 
         $searchResult['SearchHits'] = $this->buildResultObjects($searchResult, $returnType);

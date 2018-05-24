@@ -22,7 +22,7 @@ parameters:
     ezfind_search_engine.search_settings.legacy_function_handler.module_name: 'ezfind'
     ezfind_search_engine.search_settings.legacy_function_handler.function_name: 'search'
 
-    # Allow SearchService to throws eZFindException when SOLR is down or returns error
+    # Force SearchService to throw exceptions when SOLR is down or returns error
     ezfind_search_engine.search_settings.throw_errors: true
 
     # The legacy class used to generate solr query strings

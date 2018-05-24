@@ -3,19 +3,15 @@
 namespace Kaliop\EzFindSearchEngineBundle\Core\Repository;
 
 use Closure;
-use eZ\Publish\API\Repository\Values\Content\Search\Facet;
 use ezfSearchResultInfo;
-use Kaliop\EzFindSearchEngineBundle\Core\Base\Exceptions\eZFindException;
-use Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\FacetConverter;
-use Kaliop\EzFindSearchEngineBundle\DataCollector\Logger\QueryLogger;
 use Psr\Log\LoggerInterface;
+use eZ\Publish\API\Repository\Values\Content\Search\Facet;
 use eZ\Publish\API\Repository\SearchService as SearchServiceInterface;
 use eZ\Publish\API\Repository\ContentService;
 use eZ\Publish\API\Repository\ContentTypeService;
 use eZ\Publish\API\Repository\Values\Content\LocationQuery;
 use eZ\Publish\API\Repository\Values\Content\Query;
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
-use eZ\Publish\API\Repository\Values\Content\Query\Criterion\LogicalOperator;
 use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 use eZ\Publish\API\Repository\Exceptions\UnauthorizedException;
 use eZ\Publish\Core\Base\Exceptions\NotFoundException as CoreNotFoundException;
@@ -26,6 +22,9 @@ use Kaliop\EzFindSearchEngineBundle\API\Repository\Values\Search\SearchHit;
 use Kaliop\EzFindSearchEngineBundle\Core\Base\Exceptions\NotImplementedException;
 use Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriteriaConverter;
 use Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\SortClauseConverter;
+use Kaliop\EzFindSearchEngineBundle\Core\Base\Exceptions\eZFindException;
+use Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\FacetConverter;
+use Kaliop\EzFindSearchEngineBundle\DataCollector\Logger\QueryLogger;
 
 /// @todo implement LoggerTrait or similar interface
 class SearchService implements SearchServiceInterface
@@ -120,8 +119,8 @@ class SearchService implements SearchServiceInterface
         $time = null;
 
         // q: is there any case where SearchExtras is not set or of a different type?
-        if (isset($result['SearchExtras']) && $result['SearchExtras'] instanceof \ezfSearchResultInfo) {
-            /** @var \ezfSearchResultInfo $extras */
+        if (isset($result['SearchExtras']) && $result['SearchExtras'] instanceof ezfSearchResultInfo) {
+            /** @var ezfSearchResultInfo $extras */
             $extras = $result['SearchExtras'];
             $responseHeader = $extras->attribute('responseHeader');
             $time = $responseHeader['QTime'];
@@ -248,15 +247,11 @@ class SearchService implements SearchServiceInterface
         if ($this->queryLogger) {
             $this->queryLogger->addResultsInfo($searchResult['SearchExtras']);
         }
+
         $this->logSearchErrors($searchResult);
 
-        if ($this->throwErrors && isset($searchResult['SearchExtras']) && $searchResult['SearchExtras'] instanceof ezfSearchResultInfo) {
-            $errors = $searchResult['SearchExtras']->attribute('error');
-            if (is_string($errors)) {
-                throw new eZFindException($errors);
-            } elseif (isset($errors['msg']) && isset($errors['code'])) {
-                throw new eZFindException($errors['msg'], $errors['code']);
-            }
+        if ($this->throwErrors) {
+            $this->throwIfSearchError($searchResult);
         }
 
         $searchResult['SearchHits'] = $this->buildResultObjects($searchResult, $returnType);
@@ -441,6 +436,23 @@ class SearchService implements SearchServiceInterface
         return $result;
     }
 
+    protected function throwIfSearchError($searchResult)
+    {
+        if (!is_array($searchResult)) {
+            throw new eZFindException('The legacy search result is not an array');
+        }
+
+        if (isset($searchResult['SearchExtras']) && $searchResult['SearchExtras'] instanceof ezfSearchResultInfo) {
+            $errors = $searchResult['SearchExtras']->attribute('error');
+            /// @todo what if $errors it is an empty string, an array with unexepcted members or not even an array ?
+            if (is_string($errors)) {
+                throw new eZFindException($errors);
+            } elseif (is_array($errors) && isset($errors['msg']) && isset($errors['code'])) {
+                throw new eZFindException($errors['msg'], $errors['code']);
+            }
+        }
+    }
+
     protected function logSearchErrors($searchResult)
     {
         if (!is_array($searchResult)) {
@@ -453,7 +465,7 @@ class SearchService implements SearchServiceInterface
 
         /// @todo allow the query not to return some of these
         if (!isset($searchResult['SearchResult']) || !isset($searchResult['SearchCount']) || !isset($searchResult['StopWordArray']) ||
-            !isset($searchResult['SearchExtras']) || !($searchResult['SearchExtras'] instanceof \ezfSearchResultInfo)
+            !isset($searchResult['SearchExtras']) || !($searchResult['SearchExtras'] instanceof ezfSearchResultInfo)
         ) {
             if ($this->logger) {
                 $this->logger->error('The legacy search result array misses expected members');
@@ -462,7 +474,7 @@ class SearchService implements SearchServiceInterface
             return;
         }
 
-        /** @var \ezfSearchResultInfo $searchExtras */
+        /** @var ezfSearchResultInfo $searchExtras */
         $searchExtras = $searchResult['SearchExtras'];
         $errors = $searchExtras->attribute('error');
         if (!empty($errors) && $this->logger) {

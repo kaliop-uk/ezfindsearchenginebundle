@@ -5,6 +5,7 @@ namespace Kaliop\EzFindSearchEngineBundle\Core\Repository;
 use Closure;
 use eZ\Publish\API\Repository\Values\Content\Search\Facet;
 use ezfSearchResultInfo;
+use Kaliop\EzFindSearchEngineBundle\Core\Base\Exceptions\eZFindException;
 use Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\FacetConverter;
 use Kaliop\EzFindSearchEngineBundle\DataCollector\Logger\QueryLogger;
 use Psr\Log\LoggerInterface;
@@ -61,6 +62,9 @@ class SearchService implements SearchServiceInterface
 
     protected $defaultReturnType;
 
+    /** @var bool */
+    protected $throwErrors;
+
     /** @var LoggerInterface */
     protected $logger;
 
@@ -79,6 +83,7 @@ class SearchService implements SearchServiceInterface
         $defaultReturnType = KaliopQuery::RETURN_CONTENTS,
         $ezFindModule = 'ezfind',
         $ezFindFunction = 'search',
+        $throwErrors = true,
         LoggerInterface $logger = null,
         QueryLogger $queryLogger = null
     ) {
@@ -88,6 +93,7 @@ class SearchService implements SearchServiceInterface
         $this->defaultReturnType = $defaultReturnType;
         $this->ezFindModule = $ezFindModule;
         $this->ezFindFunction = $ezFindFunction;
+        $this->throwErrors = $throwErrors;
         $this->logger = $logger;
         $this->queryLogger = $queryLogger;
 
@@ -104,10 +110,7 @@ class SearchService implements SearchServiceInterface
     /**
      * @todo fill in the remaining members: timedOut, spellSuggestion
      *
-     * @param Query $query
-     * @param array $fieldFilters
-     * @param bool $filterOnUserPermissions
-     * @return KaliopSearchResult
+     * @inheritdoc
      */
     public function findContent(Query $query, array $fieldFilters = [], $filterOnUserPermissions = true)
     {
@@ -162,7 +165,11 @@ class SearchService implements SearchServiceInterface
         throw new NotImplementedException('Intentionally not implemented');
     }
 
-    /// @todo disable asking the total count for speed if possible
+    /**
+     * @todo disable asking the total count for speed if possible
+     *
+     * @inheritdoc
+     */
     public function findSingle(Criterion $criterion, array $fieldFilters = [], $filterOnUserPermissions = true)
     {
         $query = new Query();
@@ -207,11 +214,16 @@ class SearchService implements SearchServiceInterface
     }
 
     /**
+     * Perform SOLR search query.
+     *
      * @param Query $query
      * @param array $fieldFilters
      * @param bool $filterOnUserPermissions
-     * @param null|string $forceReturnObjects when set, it overrides both the service default and the query default
-     * @return array the same as returned by \eZSolr::Search(), with added members SearchHits and Facets
+     * @param null|string $forceReturnType  When set, it overrides both the service default and the query default
+     *
+     * @return array    The same as returned by \eZSolr::Search(), with added members SearchHits and Facets
+     *
+     * @throws eZFindException
      */
     protected function performSearch(
         Query $query,
@@ -237,6 +249,15 @@ class SearchService implements SearchServiceInterface
             $this->queryLogger->addResultsInfo($searchResult['SearchExtras']);
         }
         $this->logSearchErrors($searchResult);
+
+        if ($this->throwErrors && isset($searchResult['SearchExtras']) && $searchResult['SearchExtras'] instanceof ezfSearchResultInfo) {
+            $errors = $searchResult['SearchExtras']->attribute('error');
+            if (is_string($errors)) {
+                throw new eZFindException($errors);
+            } elseif (isset($errors['msg']) && isset($errors['code'])) {
+                throw new eZFindException($errors['msg'], $errors['code']);
+            }
+        }
 
         $searchResult['SearchHits'] = $this->buildResultObjects($searchResult, $returnType);
         $searchResult['Facets'] = $this->buildResultFacets($searchResult['SearchExtras'], $query->facetBuilders);

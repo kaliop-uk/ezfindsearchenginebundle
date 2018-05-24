@@ -21,6 +21,10 @@ parameters:
     # The legacy 'fetch function' used to handle searches
     ezfind_search_engine.search_settings.legacy_function_handler.module_name: 'ezfind'
     ezfind_search_engine.search_settings.legacy_function_handler.function_name: 'search'
+
+    # Allow SearchService to throws eZFindException when SOLR is down or returns error
+    ezfind_search_engine.search_settings.throw_errors: true
+
     # The legacy class used to generate solr query strings
     # (used when sorting by score and by the logicalNot criterion)
     ezfind_search_engine.search_settings.legacy_query_builder_class: '\ezfeZPSolrQueryBuilder'
@@ -76,6 +80,7 @@ services:
             - 'contents'
             - '%ezfind_search_engine.search_settings.legacy_function_handler.module_name%'
             - '%ezfind_search_engine.search_settings.legacy_function_handler.function_name%'
+            - '%ezfind_search_engine.search_settings.throw_errors%'
             - '@logger'
             - '@ezfind_search_engine.logger'
         # If you want to have a dedicated log file for this service...

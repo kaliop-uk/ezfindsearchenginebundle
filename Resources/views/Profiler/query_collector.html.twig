@@ -1,0 +1,42 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {# Display profiler only when at least one query made #}
+    {% if (collector.queriesNumber + collector.invalidQueriesNumber) > 0 %}
+        {% set icon %}
+            <a>
+                <span style="line-height:28px">
+                    <img style="width:40px;height:20px;" alt="SOLR Debug" src="data:image/png;base64,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">
+                </span>
+                {% if collector.invalidQueriesNumber %}
+                    <span class="sf-toolbar-status sf-toolbar-status-red">{{ collector.invalidQueriesNumber }}</span>
+                {% endif %}
+                {% if collector.queriesNumber %}
+                    <span class="sf-toolbar-value sf-toolbar-status">{{ collector.queriesNumber }}</span>
+                {% endif %}
+                <span class="sf-toolbar-info-piece-additional-detail">in {{ collector.totalTime }} ms</span>
+            </a>
+        {% endset %}
+
+        {% set text %}
+            <div class="sf-toolbar-info-piece">
+                <b>SOLR queries</b>
+                <span class="sf-toolbar-status">{{ collector.queriesNumber + collector.invalidQueriesNumber }}</span>
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>Invalid queries</b>
+                {% if collector.invalidQueriesNumber %}
+                    <span class="sf-toolbar-status sf-toolbar-status-red">{{ collector.invalidQueriesNumber }}</span>
+                {% else %}
+                    <span class="sf-toolbar-status">0</span>
+                {% endif %}
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>Query time</b>
+                <span class="sf-toolbar-status">{{ collector.totalTime }} ms</span>
+            </div>
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: false }) }}
+    {% endif %}
+{% endblock %}

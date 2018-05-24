@@ -5,6 +5,8 @@ namespace Kaliop\EzFindSearchEngineBundle\Core\Repository;
 use Closure;
 use eZ\Publish\API\Repository\Values\Content\Search\Facet;
 use ezfSearchResultInfo;
+use Kaliop\EzFindSearchEngineBundle\Core\Base\Exceptions\ConnectionException;
+use Kaliop\EzFindSearchEngineBundle\Core\Base\Exceptions\SolrRuntimeException;
 use Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\FacetConverter;
 use Psr\Log\LoggerInterface;
 use eZ\Publish\API\Repository\SearchService as SearchServiceInterface;
@@ -101,7 +103,12 @@ class SearchService implements SearchServiceInterface
      * @param Query $query
      * @param array $fieldFilters
      * @param bool $filterOnUserPermissions
+     *
      * @return KaliopSearchResult
+     *
+     *
+     * @throws ConnectionException
+     * @throws SolrRuntimeException
      */
     public function findContent(Query $query, array $fieldFilters = [], $filterOnUserPermissions = true)
     {
@@ -156,7 +163,20 @@ class SearchService implements SearchServiceInterface
         throw new NotImplementedException('Intentionally not implemented');
     }
 
-    /// @todo disable asking the total count for speed if possible
+    /**
+     * @todo disable asking the total count for speed if possible
+     *
+     * @param Criterion $criterion
+     * @param array $fieldFilters
+     * @param bool $filterOnUserPermissions
+     *
+     * @return SearchHit
+     *
+     * @throws CoreNotFoundException
+     * @throws InvalidArgumentException
+     * @throws ConnectionException
+     * @throws SolrRuntimeException
+     */
     public function findSingle(Criterion $criterion, array $fieldFilters = [], $filterOnUserPermissions = true)
     {
         $query = new Query();
@@ -201,11 +221,17 @@ class SearchService implements SearchServiceInterface
     }
 
     /**
+     * Perform SOLR search query.
+     *
      * @param Query $query
      * @param array $fieldFilters
      * @param bool $filterOnUserPermissions
-     * @param null|string $forceReturnObjects when set, it overrides both the service default and the query default
-     * @return array the same as returned by \eZSolr::Search(), with added members SearchHits and Facets
+     * @param null|string $forceReturnType  When set, it overrides both the service default and the query default
+     *
+     * @return array    The same as returned by \eZSolr::Search(), with added members SearchHits and Facets
+     *
+     * @throws ConnectionException
+     * @throws SolrRuntimeException
      */
     protected function performSearch(
         Query $query,
@@ -228,6 +254,15 @@ class SearchService implements SearchServiceInterface
         );
 
         $this->logSearchErrors($searchResult);
+
+        /** @var \ezfSearchResultInfo $searchExtras */
+        $searchExtras = $searchResult['SearchExtras'];
+        $errors = $searchExtras->attribute('error');
+        if (is_string($errors)) {
+            throw new ConnectionException($errors);
+        } elseif (isset($errors['msg']) && isset($errors['code'])) {
+            throw new SolrRuntimeException($errors['msg'], $errors['code']);
+        }
 
         $searchResult['SearchHits'] = $this->buildResultObjects($searchResult, $returnType);
         $searchResult['Facets'] = $this->buildResultFacets($searchResult['SearchExtras'], $query->facetBuilders);

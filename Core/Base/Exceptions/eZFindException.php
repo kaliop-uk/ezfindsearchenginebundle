@@ -2,9 +2,9 @@
 
 namespace Kaliop\EzFindSearchEngineBundle\Core\Base\Exceptions;
 
-use Exception;
+use RuntimeException;
 
-class ConnectionException extends Exception
+class eZFindException extends RuntimeException
 {
 
 }

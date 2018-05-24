@@ -5,8 +5,7 @@ namespace Kaliop\EzFindSearchEngineBundle\Core\Repository;
 use Closure;
 use eZ\Publish\API\Repository\Values\Content\Search\Facet;
 use ezfSearchResultInfo;
-use Kaliop\EzFindSearchEngineBundle\Core\Base\Exceptions\ConnectionException;
-use Kaliop\EzFindSearchEngineBundle\Core\Base\Exceptions\SolrRuntimeException;
+use Kaliop\EzFindSearchEngineBundle\Core\Base\Exceptions\eZFindException;
 use Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\FacetConverter;
 use Psr\Log\LoggerInterface;
 use eZ\Publish\API\Repository\SearchService as SearchServiceInterface;
@@ -62,6 +61,9 @@ class SearchService implements SearchServiceInterface
 
     protected $defaultReturnType;
 
+    /** @var bool */
+    protected $throwErrors;
+
     /** @var LoggerInterface */
     protected $logger;
 
@@ -77,6 +79,7 @@ class SearchService implements SearchServiceInterface
         $defaultReturnType = KaliopQuery::RETURN_CONTENTS,
         $ezFindModule = 'ezfind',
         $ezFindFunction = 'search',
+        $throwErrors = true,
         LoggerInterface $logger = null
     ) {
         $this->legacyKernelClosure = $legacyKernelClosure;
@@ -85,6 +88,7 @@ class SearchService implements SearchServiceInterface
         $this->defaultReturnType = $defaultReturnType;
         $this->ezFindModule = $ezFindModule;
         $this->ezFindFunction = $ezFindFunction;
+        $this->throwErrors = $throwErrors;
         $this->logger = $logger;
 
         // Converters
@@ -100,15 +104,7 @@ class SearchService implements SearchServiceInterface
     /**
      * @todo fill in the remaining members: timedOut, spellSuggestion
      *
-     * @param Query $query
-     * @param array $fieldFilters
-     * @param bool $filterOnUserPermissions
-     *
-     * @return KaliopSearchResult
-     *
-     *
-     * @throws ConnectionException
-     * @throws SolrRuntimeException
+     * @inheritdoc
      */
     public function findContent(Query $query, array $fieldFilters = [], $filterOnUserPermissions = true)
     {
@@ -166,16 +162,7 @@ class SearchService implements SearchServiceInterface
     /**
      * @todo disable asking the total count for speed if possible
      *
-     * @param Criterion $criterion
-     * @param array $fieldFilters
-     * @param bool $filterOnUserPermissions
-     *
-     * @return SearchHit
-     *
-     * @throws CoreNotFoundException
-     * @throws InvalidArgumentException
-     * @throws ConnectionException
-     * @throws SolrRuntimeException
+     * @inheritdoc
      */
     public function findSingle(Criterion $criterion, array $fieldFilters = [], $filterOnUserPermissions = true)
     {
@@ -230,8 +217,7 @@ class SearchService implements SearchServiceInterface
      *
      * @return array    The same as returned by \eZSolr::Search(), with added members SearchHits and Facets
      *
-     * @throws ConnectionException
-     * @throws SolrRuntimeException
+     * @throws eZFindException
      */
     protected function performSearch(
         Query $query,
@@ -255,13 +241,13 @@ class SearchService implements SearchServiceInterface
 
         $this->logSearchErrors($searchResult);
 
-        /** @var \ezfSearchResultInfo $searchExtras */
-        $searchExtras = $searchResult['SearchExtras'];
-        $errors = $searchExtras->attribute('error');
-        if (is_string($errors)) {
-            throw new ConnectionException($errors);
-        } elseif (isset($errors['msg']) && isset($errors['code'])) {
-            throw new SolrRuntimeException($errors['msg'], $errors['code']);
+        if ($this->throwErrors && isset($searchResult['SearchExtras']) && $searchResult['SearchExtras'] instanceof ezfSearchResultInfo) {
+            $errors = $searchResult['SearchExtras']->attribute('error');
+            if (is_string($errors)) {
+                throw new eZFindException($errors);
+            } elseif (isset($errors['msg']) && isset($errors['code'])) {
+                throw new eZFindException($errors['msg'], $errors['code']);
+            }
         }
 
         $searchResult['SearchHits'] = $this->buildResultObjects($searchResult, $returnType);

@@ -166,3 +166,9 @@ These are supposed to convert sort clauses
 ## Thanks
 
 Special tahnks to SOkamoto (who got this all started), CRevillo, DClements, MIwaniak, SKlimaszewski
+
+[![License](https://poser.pugx.org/kaliop/ezfindsearchenginebundle/license)](https://packagist.org/packages/kaliop/ezfindsearchenginebundle)
+[![Latest Stable Version](https://poser.pugx.org/kaliop/ezfindsearchenginebundle/v/stable)](https://packagist.org/packages/kaliop/ezfindsearchenginebundle)
+[![Total Downloads](https://poser.pugx.org/kaliop/ezfindsearchenginebundle/downloads)](https://packagist.org/packages/kaliop/ezfindsearchenginebundle)
+
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/kaliop-uk/ezfindsearchenginebundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/kaliop-uk/ezfindsearchenginebundle/?branch=master)

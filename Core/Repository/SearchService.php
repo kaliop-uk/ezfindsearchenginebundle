@@ -61,6 +61,12 @@ class SearchService implements SearchServiceInterface
 
     protected $defaultReturnType;
 
+    protected $defaultQueryHandler = 'ezpublish';
+
+    protected $defaultEnableElevation = true;
+
+    protected $defaultForceElevation = false;
+
     /** @var bool */
     protected $throwErrors;
 
@@ -329,7 +335,7 @@ class SearchService implements SearchServiceInterface
             $searchParameters['query'] = $this->filterCriteriaConverter->generateQueryString($criterionFilter);
             $searchParameters['filter'] = $filterFilter;
         } else {
-            // since we are not sorting by score, no need to do complex stuff. Only use a solr filter, which should be fatster
+            // since we are not sorting by score, no need to do complex stuff. Only use a solr filter, which should be faster
             $searchParameters['query'] = '';
             $searchParameters['filter'] = array_merge($criterionFilter, $filterFilter);
         }
@@ -353,15 +359,15 @@ class SearchService implements SearchServiceInterface
                         $query->boostFunctions
                     )) ? $query->boostFunctions : $this->defaultBoostFunctions;
             case 'enable_elevation':
-                return ($query instanceof KaliopQuery) ? $query->enableElevation : true;
+                return ($query instanceof KaliopQuery) ? $query->enableElevation : $this->defaultEnableElevation;
             case 'fields_to_return':
                 return ($query instanceof KaliopQuery && is_array(
                         $query->fieldsToReturn
                     )) ? $query->fieldsToReturn : $this->defaultFieldsToReturn;
             case 'force_elevation':
-                return ($query instanceof KaliopQuery) ? $query->forceElevation : false;
+                return ($query instanceof KaliopQuery) ? $query->forceElevation : $this->defaultForceElevation;
             case 'query_handler':
-                return ($query instanceof KaliopQuery) ? $query->queryHandler : 'ezpublish';
+                return ($query instanceof KaliopQuery) ? $query->queryHandler : $this->defaultQueryHandler;
         }
     }
 

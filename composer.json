@@ -10,7 +10,7 @@
         "ezsystems/ezfind-ls":  "*"
     },
     "require-dev": {
-        "kaliop/ezmigrationbundle": "~4.0",
+        "kaliop/ezmigrationbundle": "~4.0 || ~5.0",
         "phpunit/phpunit": "~4.0 || ~5.0",
         "codeclimate/php-test-reporter": "~0.4"
     },

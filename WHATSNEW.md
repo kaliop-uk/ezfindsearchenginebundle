@@ -1,8 +1,13 @@
-Version 1.3 (unreleased)
-========================
+Version 1.3
+===========
 
 * Improved: made it easier to change the default values for QueryHandler, EnableElevation and ForceElevation by
-    subclassing the SearchService 
+    subclassing the SearchService
+
+* Improved: the FullText Criterion will now treat text surrounded by double quotes as meaning 'exact match',
+    while still doing its magic mangling for text beginning or ending with a wildcard character
+
+* Improved:  declare compatibility with Kaliop Migrations bundle v5
 
 
 Version 1.2
@@ -10,12 +15,11 @@ Version 1.2
 
 * Changed: the SearchService will now throw exceptions by default when there is an error reported by eZFind in the communication
     to SOLR.
-    
+
     You can disable this behaviour by altering symfony parameter `ezfind_search_engine.search_settings.throw_errors`.
-    
+
     For the moment the exception thrown is a `Kaliop\EzFindSearchEngineBundle\Core\Base\Exception\eZFindException`; in the
     future we might be able to identify better the different error cases using subclasses thereof.
-    
 
 * BC: the constructor of the SearchService has changed signature. In case you had extended it, please revise your subclasses.
 

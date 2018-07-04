@@ -24,25 +24,38 @@ class FullText extends CriterionHandler
      */
     public function handle(CriteriaConverter $converter, Criterion $criterion)
     {
-        // Search for all
-        if (trim($criterion->value) == '*') {
+        $value = trim($criterion->value);
+
+        if ($value == '*') {
+            // Pure wildcard query
             return 'ezf_df_text:*';
-        }
 
-        $value = $this->escapeValue(trim($criterion->value));
+        } else if (preg_match('/^".+"$/', $value)) {
+            // Quoted-string query: escape everything but the outher quotes
+            $value = '"' . $this->escapeValue(substr($value, 1, -1)) . '"';
 
-        // Check if wildcard query
-        if ($value && $value != '*' && trim($value, '*') != $value) {
+        } else if (preg_match('/(^\*|\*$)/', $value)) {
+            // Wildcard query: make the exacth match stronger than the wildcard
+
+            // @bug we do not support wildcard chars in the middle of phrases
+
+            $value = $this->escapeValue($value);
+
             // Escape spaces
             $value = str_replace(' ', '\\ ', $value);
 
-            // Un-escape wildcard
+            // wildcard match: un-escape wildcard char
             $wildcard = str_replace('\\*', '*', $value);
 
-            // Non-wildcard value
-            $value = trim($value, '\*');
+            // Non-wildcard match
+            $value = trim($value, '*');
+            $value = rtrim($value, '\\');
 
             $value = $value . '^2 OR ' . $wildcard;
+
+        } else {
+            // plain query
+            $value = $this->escapeValue($value);
         }
 
         return 'ezf_df_text:(' . $value . ')';

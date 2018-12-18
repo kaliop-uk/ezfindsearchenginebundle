@@ -241,7 +241,7 @@ class SearchService implements SearchServiceInterface
         $this->initializeQueryLimit($query);
 
         $searchParameters = $this->getLegacySearchParameters($query, $fieldFilters, $filterOnUserPermissions, $returnType);
-
+//var_dump($searchParameters);
         /** @var array $searchResult */
         $searchResult = $this->getLegacyKernel()->runCallback(
             function () use ($searchParameters) {
@@ -315,7 +315,7 @@ class SearchService implements SearchServiceInterface
                 $scoreSort = true;
             }
         }
-
+//var_dump($query->criterion);die();
         $criterionFilter = array();
         if ($query->criterion) {
             $criterionFilter = $this->extractFilter($query->criterion);
@@ -330,7 +330,10 @@ class SearchService implements SearchServiceInterface
             $searchParameters['facet'] = $this->extractFacet($query->facetBuilders);
         }
 
-        if ($scoreSort) {
+        if ($this->isEzFindCriterion($query->criterion)) {
+            $searchParameters['query'] = reset($criterionFilter);
+            $searchParameters['filter'] = $filterFilter;
+        } elseif ($scoreSort) {
             // since we are sorting by score, we need to generate the solr query, as that is what is used to calculate score
             $searchParameters['query'] = $this->filterCriteriaConverter->generateQueryString($criterionFilter);
             $searchParameters['filter'] = $filterFilter;
@@ -387,6 +390,20 @@ class SearchService implements SearchServiceInterface
         }
 
         return ($query instanceof KaliopQuery && $query->returnType !== null) ? $query->returnType : $this->defaultReturnType;
+    }
+
+    /**
+     * Returns true if there is a single search criterion of type EzFindText
+     * @param Query\Criterion|Query\Criterion[] $criteria $criteria
+     * @return bool
+     */
+    protected function isEzFindCriterion($criteria)
+    {
+        if (!is_array($criteria)) {
+            $criteria = array($criteria);
+        }
+
+        return (count($criteria) == 1 && $criteria[0] instanceof KaliopQuery\Criterion\EzFindText);
     }
 
     /**
@@ -447,7 +464,7 @@ class SearchService implements SearchServiceInterface
         if (!is_array($searchResult)) {
             throw new eZFindException('The legacy search result is not an array');
         }
-
+//var_dump($searchResult);die();
         if (isset($searchResult['SearchExtras']) && $searchResult['SearchExtras'] instanceof ezfSearchResultInfo) {
             $errors = $searchResult['SearchExtras']->attribute('error');
             /// @todo what if $errors it is an empty string, an array with unexepcted members or not even an array ?

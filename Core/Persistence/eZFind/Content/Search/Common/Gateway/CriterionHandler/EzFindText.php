@@ -5,19 +5,20 @@ namespace Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
 use Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriteriaConverter;
 use Kaliop\EzFindSearchEngineBundle\Core\Persistence\eZFind\Content\Search\Common\Gateway\CriterionHandler;
+use Kaliop\EzFindSearchEngineBundle\API\Repository\Values\Content\Query\Criterion\EzFindText as EzFindTextCriterion;
 
-class FullText extends CriterionHandler
+class EzFindText extends CriterionHandler
 {
     /**
      * @inheritdoc
      */
     public function accept(Criterion $criterion)
     {
-        return $criterion instanceof Criterion\FullText;
+        return $criterion instanceof EzFindTextCriterion;
     }
 
     /**
-     * If the FullText search contain wildcard search, build correct wildcard query
+     * If the full-text search contain wildcard search, build correct wildcard query
      * with non-truncated words boosted.
      *
      * @inheritdoc
@@ -26,11 +27,7 @@ class FullText extends CriterionHandler
     {
         $value = trim($criterion->value);
 
-        if ($value == '*') {
-            // Pure wildcard query
-            return 'ezf_df_text:*';
-
-        } else if (preg_match('/^".+"$/', $value)) {
+        if (preg_match('/^".+"$/', $value)) {
             // Quoted-string query: escape everything but the outher quotes
             $value = '"' . $this->escapeValue(substr($value, 1, -1)) . '"';
 
@@ -58,6 +55,6 @@ class FullText extends CriterionHandler
             $value = $this->escapeValue($value);
         }
 
-        return 'ezf_df_text:(' . $value . ')';
+        return $value;
     }
 }

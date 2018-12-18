@@ -1,3 +1,21 @@
+Version 1.4
+===========
+
+* New: a new Query Criterion, `EzFindText`, can now be used to fully emulated legacy 'ezfind searches', i.e. do a
+    full-text search across all indexed content fields, instead of matching the `ezf_df_text` field as is done when using
+    a `FullText` criterion. This can greatly improve relevancy sorting.
+    
+    Ex:
+    
+        use Kaliop\EzFindSearchEngineBundle\API\Repository\Values\Content\Query\Criterion\EzFindText;
+        use Kaliop\EzFindSearchEngineBundle\API\Repository\Values\Content\Query\SortClause\Score; 
+        ...
+        $query->query = new EzFindText('hello world');
+        $query->sortClauses = [new Score('descending')];
+        
+    *NB* the `EzFindText` criterion should be used as unique member of your query's `query` member.
+    When using it, use the query's `filter` member to add any other criteria.
+        
 Version 1.3
 ===========
 

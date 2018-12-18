@@ -4,6 +4,9 @@
   - fulltext: might currently differ
   - objectstateid: what happens when many states are passed in?
 
+* check what happens when an ezfindtext criterion is used in the 'filter' member of a query, or when it is used together
+  with other filters 
+
 * check list of all missing criteria converters compared to std search service (for Content searches)
   - contenttypegroup: can not do
   - datemetadata: fails with operator IN
